@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Monevo Weekly Financial Intelligence Report — 1080 × 1350 WhatsApp Format
-// Luxury Gradient Design with Official Monevo Logo & Dynamic Financial Visuals
+// Premium editorial-fintech design system
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ITopCategory } from '../../types/models';
@@ -24,11 +24,10 @@ export interface WeeklyReportTemplateData {
   aiInsight?: string;     // optional override; generated from data if absent
 }
 
-// ── Ultra-Sleek Gradient Fintech Palette ──────────────────────────────────────
+// ── Pure White / Light Theme Palette (consistent with receipt) ──────────────
 const C = {
   bg:           '#FFFFFF',
   surface:      '#F8FAFC',
-  cardBg:       '#FFFFFF',
   border:       '#E2E8F0',
   borderFaint:  '#F1F5F9',
   textPrimary:  '#0F172A',
@@ -36,116 +35,32 @@ const C = {
   textMuted:    '#64748B',
   textGhost:    '#94A3B8',
   blue:         '#1A6EFF',
-  blueDark:     '#1D4ED8',
-  blueDim:      '#93C5FD',
-  bluePanel:    '#EFF6FF',
-  indigo:       '#6366F1',
-  indigoDark:   '#4338CA',
-  cyan:         '#06B6D4',
-  green:        '#10B981',
-  greenDark:    '#059669',
-  greenLight:   '#34D399',
-  greenBg:      '#ECFDF5',
-  red:          '#F43F5E',
-  redDark:      '#E11D48',
-  redLight:     '#FB7185',
-  redBg:        '#FFF1F2',
-  amber:        '#F59E0B',
-  purple:       '#8B5CF6',
+  blueDim:      '#2563EB',
+  green:        '#16A34A',
+  greenBg:      '#DCFCE7',
+  greenText:    '#16A34A',
+  red:          '#DC2626',
+  redBg:        '#FEE2E2',
+  redText:      '#DC2626',
 };
 
-export function renderMonevoLogoSvg(x: number, y: number, showBadge = true): string {
-  return `
-  <!-- Monevo Logo Mark -->
-  <g transform="translate(${x}, ${y})">
-    <rect width="48" height="48" rx="14" fill="url(#logoGrad)"/>
-    <!-- Dynamic 'M' ribbon -->
-    <path d="M 14 34 V 20 C 14 17.5 15.8 15.5 18 15.5 C 19.3 15.5 20.5 16.2 21.2 17.3 L 24 21.5 L 26.8 17.3 C 27.5 16.2 28.7 15.5 30 15.5 C 32.2 15.5 34 17.5 34 20 V 34"
-      fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="24" cy="31" r="2.2" fill="#38BDF8"/>
-  </g>
-  <!-- Wordmark -->
-  <text x="${x + 62}" y="${y + 35}" font-size="32" font-weight="800" fill="${C.textPrimary}" letter-spacing="-0.8">monevo<tspan fill="${C.blue}">.</tspan></text>
-  ${
-    showBadge
-      ? `<rect x="${x + 224}" y="${y + 12}" width="34" height="20" rx="6" fill="${C.bluePanel}" stroke="${C.blueDim}" stroke-width="1"/>
-  <text x="${x + 241}" y="${y + 26}" font-size="10" font-weight="800" fill="${C.blueDark}" text-anchor="middle" letter-spacing="1">AI</text>`
-      : ''
-  }`;
-}
-
-// ── Category gradient palettes ────────────────────────────────────────────────
+// ── Cashflow bar colors ───────────────────────────────────────────────────────
 const CAT_COLORS = [
-  '#1A6EFF', // Blue
-  '#10B981', // Green
-  '#8B5CF6', // Purple
-  '#F59E0B', // Amber
-  '#06B6D4', // Cyan
+  '#1A6EFF', // blue
+  '#16A34A', // green
+  '#8B5CF6', // purple
+  '#F59E0B', // amber
+  '#06B6D4', // cyan
 ];
 
-const CAT_GRAD_PAIRS = [
-  ['#60A5FA', '#1A6EFF'],  // Blue
-  ['#34D399', '#10B981'],  // Green
-  ['#C4B5FD', '#8B5CF6'],  // Purple
-  ['#FCD34D', '#F59E0B'],  // Amber
-  ['#67E8F9', '#06B6D4'],  // Cyan
-];
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-// ── Category SVG icons ────────────────────────────────────────────────────────
-
-function getCategoryIcon(category: string, x: number, y: number, color: string): string {
-  const lc = category.toLowerCase();
-
-  const icons: Record<string, string> = {
-    food: `<g transform="translate(${x},${y})">
-      <circle cx="9" cy="10" r="6" fill="none" stroke="${color}" stroke-width="1.4"/>
-      <path d="M5.5 3v4.5c0 .5.4.8.8.8h.4L6.5 14h1.2l.2-5.7h.4c.4 0 .8-.3.8-.8V3" fill="none" stroke="${color}" stroke-width="1.2" stroke-linecap="round"/>
-      <path d="M12.5 3c0 0-1 .5-1 2.5s1 2.5 1 2.5v6" fill="none" stroke="${color}" stroke-width="1.2" stroke-linecap="round"/>
-    </g>`,
-
-    transport: `<g transform="translate(${x},${y})">
-      <path d="M3 10.5l1.2-4c.3-.7.9-1.1 1.6-1.1h6.4c.7 0 1.3.4 1.6 1.1l1.2 4v3H3v-3z" fill="none" stroke="${color}" stroke-width="1.3" stroke-linejoin="round"/>
-      <circle cx="5.5" cy="13.5" r="1.2" fill="${color}"/>
-      <circle cx="12.5" cy="13.5" r="1.2" fill="${color}"/>
-    </g>`,
-
-    fuel: `<g transform="translate(${x},${y})">
-      <rect x="3" y="4.5" width="8" height="10" rx="1.2" fill="none" stroke="${color}" stroke-width="1.3"/>
-      <rect x="4.5" y="6" width="5" height="3.5" rx="0.6" fill="${color}" opacity="0.2"/>
-      <path d="M11 7l2 1.5v4c0 .6.4 1 .9 1s.9-.4.9-1V9" fill="none" stroke="${color}" stroke-width="1.2" stroke-linecap="round"/>
-    </g>`,
-
-    rent: `<g transform="translate(${x},${y})">
-      <path d="M2.5 9L9 3.5 15.5 9" fill="none" stroke="${color}" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M4.5 9.5v5.5h3.5v-3.5h2v3.5h3.5V9.5" fill="none" stroke="${color}" stroke-width="1.3"/>
-    </g>`,
-
-    utilities: `<g transform="translate(${x},${y})">
-      <path d="M10.5 2L6 9h3.5L8 16l6-8h-3.5L10.5 2z" fill="${color}" opacity="0.85"/>
-    </g>`,
-
-    salary: `<g transform="translate(${x},${y})">
-      <rect x="2.5" y="4.5" width="13" height="9" rx="1.5" fill="none" stroke="${color}" stroke-width="1.3"/>
-      <circle cx="9" cy="9" r="2.2" fill="none" stroke="${color}" stroke-width="1.2"/>
-    </g>`,
-
-    freelance: `<g transform="translate(${x},${y})">
-      <rect x="2.5" y="5" width="13" height="8.5" rx="1.2" fill="none" stroke="${color}" stroke-width="1.3"/>
-      <path d="M6 5V3.5c0-.6.4-1 1-1h4c.6 0 1 .4 1 1V5" fill="none" stroke="${color}" stroke-width="1.2"/>
-    </g>`,
-
-    shopping: `<g transform="translate(${x},${y})">
-      <path d="M4 6h10l-1 8H5L4 6z" fill="none" stroke="${color}" stroke-width="1.3"/>
-      <path d="M6.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="${color}" stroke-width="1.2"/>
-    </g>`,
-  };
-
-  const defaultIcon = `<g transform="translate(${x},${y})">
-    <circle cx="9" cy="9" r="6.5" fill="none" stroke="${color}" stroke-width="1.3"/>
-    <text x="9" y="13" font-size="10" font-weight="700" fill="${color}" text-anchor="middle">•</text>
-  </g>`;
-
-  return icons[lc] || defaultIcon;
+function amtFontSize(formatted: string): number {
+  const len = formatted.length;
+  if (len <= 8)  return 96;
+  if (len <= 10) return 80;
+  if (len <= 12) return 68;
+  return 58;
 }
 
 function capitalize(s: string): string {
@@ -153,60 +68,82 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
-function amtFontSize(formatted: string): number {
-  const len = formatted.length;
-  if (len <= 8)  return 74;
-  if (len <= 11) return 64;
-  if (len <= 14) return 54;
-  return 44;
-}
+// ── Deterministic AI insight ──────────────────────────────────────────────────
+// Rule-based; never invents numbers or facts not in the data
+// Returns { brief: one short phrase, full: complete sentence }
 
-// ── AI Insight Generator ──────────────────────────────────────────────────────
+interface InsightText { brief: string; full: string; }
 
-function generateInsight(data: WeeklyReportTemplateData): { brief: string; full: string } {
-  const { totalIncome, totalExpenses, net, formattedNet, formattedIncome, topCategories } = data;
-  const topCat = topCategories.length > 0 ? topCategories[0] : null;
-  const topCatName = topCat ? capitalize(topCat.category) : '';
-  const topCatPct = topCat && totalExpenses > 0 ? Math.round((topCat.amount / totalExpenses) * 100) : 0;
+function generateInsight(data: WeeklyReportTemplateData): InsightText {
+  const { totalIncome, totalExpenses, net, transactionCount, topCategories } = data;
+  const { formattedIncome, formattedExpenses, formattedNet, currency } = data;
+  const totalVolume = totalIncome + totalExpenses;
 
-  if (totalIncome === 0 && totalExpenses === 0) {
+  if (transactionCount === 0) {
     return {
-      brief: 'No financial activity was recorded during this period.',
-      full:  'Start tracking your expenses and payments by dropping a quick message on WhatsApp anytime!',
+      brief: 'No transactions recorded this week.',
+      full:  'Start logging income and expenses to see your weekly financial intelligence report.',
     };
   }
 
-  if (totalExpenses === 0 && totalIncome > 0) {
+  const top = topCategories[0];
+  const catStr = top ? ` Top category: ${capitalize(top.category)}.` : '';
+
+  if (totalIncome === 0) {
     return {
-      brief: `Strong week! Total income recorded was ${formattedIncome} with 0 expenses logged.`,
-      full:  `Outstanding financial momentum this week. You accumulated ${formattedIncome} with zero expenses logged.`,
+      brief: `Only expenses this week: ${formattedExpenses}.`,
+      full:  `Only expenses were recorded this week, totalling ${formattedExpenses}.${catStr}`,
     };
   }
+
+  if (totalExpenses === 0) {
+    return {
+      brief: `Income only: ${formattedIncome}. No expenses tracked.`,
+      full:  `Only income was recorded this week, totalling ${formattedIncome}. No expenses tracked.`,
+    };
+  }
+
+  const netPct = totalVolume > 0 ? Math.round((Math.abs(net) / totalVolume) * 100) : 0;
 
   if (net > 0) {
-    const savingsRate = Math.round((net / totalIncome) * 100);
-    const catStr = topCat ? ` Top expense was ${topCatName} (${topCatPct}%).` : '';
+    if (netPct >= 88) {
+      return {
+        brief: `Cashflow strongly positive this week.`,
+        full:  `Income greatly exceeded expenses. Net cashflow of ${formattedNet} ${currency} represents a ${netPct}% positive balance.${catStr}`,
+      };
+    }
+    if (netPct >= 50) {
+      return {
+        brief: `Positive cashflow. Net: ${formattedNet}.`,
+        full:  `Income of ${formattedIncome} outpaced expenses of ${formattedExpenses}, leaving a net of ${formattedNet}.${catStr}`,
+      };
+    }
     return {
-      brief: `Positive net cashflow! Retained ${savingsRate}% of income with a surplus of ${formattedNet}.`,
-      full:  `Excellent cash discipline this week. Your net cashflow was ${formattedNet} (${savingsRate}% retention).${catStr}`,
+      brief: `Slightly positive this week. Net: ${formattedNet}.`,
+      full:  `Cashflow was slightly positive with net ${formattedNet}. Consider reviewing expenses to improve your surplus.${catStr}`,
     };
   }
 
   if (net < 0) {
-    const catStr = topCat ? ` ${topCatName} represented your biggest spend (${topCatPct}%).` : '';
+    if (netPct >= 50) {
+      return {
+        brief: `Expenses exceeded income. Net outflow: ${formattedNet}.`,
+        full:  `Expenses significantly exceeded income. Net outflow of ${formattedNet}. Review spending to improve your position.${catStr}`,
+      };
+    }
     return {
-      brief: `Expenses exceeded income by ${formattedNet}. Watch out for discretionary spends.`,
-      full:  `Outflows exceeded inflows by ${formattedNet} this week.${catStr} Plan upcoming spending to restore surplus.`,
+      brief: `Slightly negative cashflow. Net outflow: ${formattedNet}.`,
+      full:  `Expenses slightly exceeded income with a net outflow of ${formattedNet}.${catStr}`,
     };
   }
 
   return {
-    brief: `Balanced week with equal inflow and outflow at ${formattedIncome}.`,
-    full:  `Income and expenses balanced at ${formattedIncome}. Consider setting aside a 10% safety buffer next week.`,
+    brief: `Perfectly balanced this week at ${formattedIncome}.`,
+    full:  `Income and expenses balanced exactly this week at ${formattedIncome}. A perfect equilibrium.`,
   };
 }
 
-// ── Top Categories Renderer ───────────────────────────────────────────────────
+// ── Category bar renderer ─────────────────────────────────────────────────────
 
 function renderCategories(
   cats: ITopCategory[],
@@ -216,48 +153,98 @@ function renderCategories(
 ): { svg: string; endY: number } {
   const visible = cats.slice(0, 5);
   const totalExp = totalExpenses > 0 ? totalExpenses : 1;
-  const ROW_H = 56;
-  const ICON_X = 110;
-  const NAME_X = 140;
-  const BAR_X = 300;
-  const BAR_W = 480;
+  const ROW_H = 58;
+  const BAR_X = 250;
+  const BAR_W = 570;
   const AMT_X = BAR_X + BAR_W + 20;
 
   if (visible.length === 0) {
     const svg = `
-    <text x="110" y="${startY + 30}" font-size="18" font-weight="500" fill="${C.textMuted}">
-      No expense transactions recorded during this period.
-    </text>`;
-    return { svg, endY: startY + 50 };
+  <text x="80" y="${startY + 36}"
+    font-size="22" font-weight="400" fill="${C.textMuted}"
+    >No expense transactions recorded this week.</text>`;
+    return { svg, endY: startY + 60 };
   }
 
   let svg = '';
   visible.forEach((cat, idx) => {
     const fy = startY + idx * ROW_H;
     const pct = Math.round((cat.amount / totalExp) * 100);
-    const barW = Math.max(8, Math.round((pct / 100) * BAR_W));
+    const barW = Math.max(6, Math.round((pct / 100) * BAR_W));
     const color = CAT_COLORS[idx % CAT_COLORS.length];
     const catName = escapeXml(capitalize(cat.category));
-    const curSym = currency === 'NGN' ? '₦' : currency + ' ';
-    const amtStr = escapeXml(`${curSym}${cat.amount.toLocaleString('en-US')}`);
+    const amtStr = escapeXml(`${currency === 'NGN' ? '₦' : currency + ' '}${cat.amount.toLocaleString('en-US')}`);
 
     svg += `
-    <!-- Category row: ${catName} -->
-    <circle cx="${ICON_X}" cy="${fy + 14}" r="14" fill="${color}" fill-opacity="0.12"/>
-    ${getCategoryIcon(cat.category, ICON_X - 9, fy + 5, color)}
-    <text x="${NAME_X}" y="${fy + 19}" font-size="16" font-weight="700" fill="${C.textPrimary}">${catName}</text>
-    
-    <!-- Progress bar track -->
-    <rect x="${BAR_X}" y="${fy + 8}" width="${BAR_W}" height="12" rx="6" fill="#F1F5F9"/>
-    <!-- Progress bar fill -->
-    <rect x="${BAR_X}" y="${fy + 8}" width="${barW}" height="12" rx="6" fill="url(#bar${idx})"/>
-    
-    <text x="${AMT_X}" y="${fy + 19}" font-size="15" font-weight="700" fill="${C.textPrimary}">${amtStr}</text>
-    <rect x="${AMT_X + 115}" y="${fy + 2}" width="42" height="22" rx="6" fill="#F1F5F9"/>
-    <text x="${AMT_X + 136}" y="${fy + 17}" font-size="11" font-weight="800" fill="${C.textMuted}" text-anchor="middle">${pct}%</text>`;
+  <!-- Category: ${catName} -->
+  <text x="80" y="${fy + 22}"
+    font-size="15" font-weight="600" fill="${C.textPrimary}">${catName}</text>
+  <rect x="${BAR_X}" y="${fy + 10}" width="${BAR_W}" height="10" rx="5" fill="${C.borderFaint}"/>
+  <rect x="${BAR_X}" y="${fy + 10}" width="${barW}" height="10" rx="5" fill="${color}"/>
+  <text x="${AMT_X}" y="${fy + 22}"
+    font-size="14" font-weight="700" fill="${C.textPrimary}">${amtStr}</text>
+  <text x="${AMT_X + 140}" y="${fy + 22}"
+    font-size="13" font-weight="500" fill="${C.textMuted}">${pct}%</text>`;
   });
 
   return { svg, endY: startY + visible.length * ROW_H };
+}
+
+// ── Cashflow bar renderer ─────────────────────────────────────────────────────
+
+function renderCashflowBars(
+  totalIncome: number,
+  totalExpenses: number,
+  _formattedIncome: string,
+  _formattedExpenses: string,
+  currency: string,
+  startY: number
+): string {
+  const totalVol = totalIncome + totalExpenses;
+  const BAR_X = 200;
+  const BAR_W = 540;
+  const MAX_BAR = BAR_W;
+
+  let incW = 0;
+  let expW = 0;
+  let incPct = 0;
+  let expPct = 0;
+
+  if (totalVol > 0) {
+    incPct = Math.round((totalIncome / totalVol) * 100);
+    expPct = 100 - incPct;
+    incW = Math.max(4, Math.round((incPct / 100) * MAX_BAR));
+    expW = Math.max(4, Math.round((expPct / 100) * MAX_BAR));
+  }
+
+  const cur = currency === 'NGN' ? '₦' : currency + ' ';
+  const incStr = escapeXml(`+${cur}${totalIncome.toLocaleString('en-US')}`);
+  const expStr = escapeXml(`−${cur}${totalExpenses.toLocaleString('en-US')}`);
+
+  return `
+  ${totalVol === 0 ? `
+  <text x="80" y="${startY + 20}"
+    font-size="14" font-weight="400" fill="${C.textMuted}"
+    >No cashflow activity recorded this period.</text>` : `
+  <!-- Income bar row -->
+  <text x="80" y="${startY + 20}"
+    font-size="12" font-weight="700" fill="${C.textMuted}" letter-spacing="2">INCOME</text>
+  <rect x="${BAR_X}" y="${startY + 8}" width="${BAR_W}" height="14" rx="7" fill="${C.borderFaint}"/>
+  <rect x="${BAR_X}" y="${startY + 8}" width="${incW}" height="14" rx="7" fill="${C.green}"/>
+  <text x="${BAR_X + BAR_W + 20}" y="${startY + 20}"
+    font-size="15" font-weight="700" fill="${C.green}">${incStr}</text>
+  <text x="${BAR_X + BAR_W + 20}" y="${startY + 38}"
+    font-size="12" font-weight="500" fill="${C.textMuted}">${incPct}%</text>
+
+  <!-- Expenses bar row -->
+  <text x="80" y="${startY + 70}"
+    font-size="12" font-weight="700" fill="${C.textMuted}" letter-spacing="2">EXPENSES</text>
+  <rect x="${BAR_X}" y="${startY + 58}" width="${BAR_W}" height="14" rx="7" fill="${C.borderFaint}"/>
+  <rect x="${BAR_X}" y="${startY + 58}" width="${expW}" height="14" rx="7" fill="${C.red}"/>
+  <text x="${BAR_X + BAR_W + 20}" y="${startY + 70}"
+    font-size="15" font-weight="700" fill="${C.red}">${expStr}</text>
+  <text x="${BAR_X + BAR_W + 20}" y="${startY + 88}"
+    font-size="12" font-weight="500" fill="${C.textMuted}">${expPct}%</text>`}`;
 }
 
 // ── Main SVG generator ────────────────────────────────────────────────────────
@@ -265,9 +252,8 @@ function renderCategories(
 export function generateWeeklyReportSvg(data: WeeklyReportTemplateData): string {
   const W  = 1080;
   const H  = 1350;
-  const MX = 70;
-  const RX = W - MX; // 1010
-  const CARD_W = RX - MX; // 940
+  const MX = 80;
+  const RX = W - MX;
 
   const currency = escapeXml(data.currency || 'NGN');
   const period   = escapeXml(data.periodLabel);
@@ -279,242 +265,185 @@ export function generateWeeklyReportSvg(data: WeeklyReportTemplateData): string 
 
   const isNetPositive = data.net >= 0;
   const netSign  = data.net > 0 ? '+' : data.net < 0 ? '−' : '';
-  const netColor = isNetPositive ? C.greenDark : C.redDark;
-  const netBgGrad = isNetPositive ? 'url(#netCardGradSurplus)' : 'url(#netCardGradDeficit)';
+  const netColor = isNetPositive ? C.green : C.red;
 
-  const formattedNet = escapeXml(data.formattedNet);
+  const formattedAmount = escapeXml(data.formattedNet);
   const netFS = amtFontSize(data.formattedNet);
 
+  // Compute insight texts (brief for primary metric, full for MONEVO SAYS)
   const insight = generateInsight(data);
   const briefText  = data.aiInsight ? data.aiInsight : insight.brief;
-  const fullLines  = wrapText(data.aiInsight || insight.full, 68).slice(0, 3);
+  const fullLines  = wrapText(data.aiInsight || insight.full, 70).slice(0, 3);
 
-  // Category rendering start
-  const CAT_START_Y = 668;
+  // ── Sequential Y layout ────────────────────────────────────────────────────
+  // HEADER: 80-172 (rule at 172)
+  const HEADER_RULE = 172;
+
+  // NET CASHFLOW SECTION
+  const NET_LABEL_Y  = HEADER_RULE + 46;              // 218
+  const NET_AMT_Y    = NET_LABEL_Y + 16 + netFS;      // label + gap + amount baseline
+  const SPLIT_Y      = NET_AMT_Y + 52;                // income/expense amounts
+  const SPLIT_LBL_Y  = SPLIT_Y + 26;                  // INCOME / EXPENSES micro-labels
+  const BRIEF_Y      = SPLIT_LBL_Y + 42;              // brief one-liner insight
+  const RULE1_Y      = BRIEF_Y + 32;                  // section rule after brief insight
+
+  // CASHFLOW BREAKDOWN
+  const CF_LABEL_Y   = RULE1_Y + 34;
+  const CF_BAR_Y     = CF_LABEL_Y + 20;               // bars start
+  const CF_END_Y     = CF_BAR_Y + 102;                // income row (50) + expense row (52)
+  const RULE2_Y      = CF_END_Y + 22;
+
+  // WHERE YOUR MONEY WENT
+  const CAT_LABEL_Y  = RULE2_Y + 36;
+  const CAT_START_Y  = CAT_LABEL_Y + 30;
   const { svg: catSvg, endY: catEndY } = renderCategories(
     data.topCategories, data.totalExpenses, data.currency, CAT_START_Y
   );
+  const RULE3_Y      = catEndY + 24;
 
-  const AI_CARD_Y = Math.max(catEndY + 28, 970);
-  const AI_CARD_H = 176;
+  // MONEVO SAYS
+  const AI_LABEL_Y   = RULE3_Y + 36;
+  const AI_TEXT_Y    = AI_LABEL_Y + 40;
+  const AI_END_Y     = AI_TEXT_Y + fullLines.length * 34;
 
-  // Split calculations
-  const totalVol = data.totalIncome + data.totalExpenses;
-  const incPct = totalVol > 0 ? Math.round((data.totalIncome / totalVol) * 100) : 50;
-  const expPct = 100 - incPct;
-  const ratioBarW = CARD_W - 80;
-  const incBarW = Math.max(8, Math.round((incPct / 100) * ratioBarW));
+  // FOOTER
+  const FOOTER_RULE  = Math.max(AI_END_Y + 46, H - 98);
+  const FOOTER_TXT   = FOOTER_RULE + 40;
+
+  // Pre-render cashflow bars
+  const cashflowSvg = renderCashflowBars(
+    data.totalIncome, data.totalExpenses,
+    data.formattedIncome, data.formattedExpenses,
+    data.currency,
+    CF_BAR_Y
+  );
 
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
-  font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
 
   <defs>
-    <!-- Logo Gradient -->
-    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#6366F1"/>
-      <stop offset="50%" stop-color="#1A6EFF"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-
-    <!-- AI Mini Badge Gradient -->
-    <linearGradient id="aiBadgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-
-    <!-- Hero Multi-Stop Banner Gradient -->
-    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#6366F1"/>
-      <stop offset="35%" stop-color="#1A6EFF"/>
-      <stop offset="70%" stop-color="#06B6D4"/>
-      <stop offset="100%" stop-color="#10B981"/>
-    </linearGradient>
-
-    <!-- Ambient Mesh Gradients -->
-    <radialGradient id="meshTop" cx="15%" cy="12%" r="600" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#EFF6FF" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="meshBottom" cx="85%" cy="88%" r="650" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ECFDF5" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Net Card Gradients -->
-    <linearGradient id="netCardGradSurplus" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="70%" stop-color="#F8FAFC"/>
-      <stop offset="100%" stop-color="#ECFDF5"/>
-    </linearGradient>
-    <linearGradient id="netCardGradDeficit" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="70%" stop-color="#F8FAFC"/>
-      <stop offset="100%" stop-color="#FFF1F2"/>
-    </linearGradient>
-
-    <!-- Income Gradient -->
-    <linearGradient id="incomeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#34D399"/>
-      <stop offset="100%" stop-color="#059669"/>
-    </linearGradient>
-
-    <!-- Expense Gradient -->
-    <linearGradient id="expenseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FB7185"/>
-      <stop offset="100%" stop-color="#E11D48"/>
-    </linearGradient>
-
-    <!-- Category Gradients -->
-    ${CAT_GRAD_PAIRS.map((pair, i) => `<linearGradient id="bar${i}" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="${pair[0]}"/>
-      <stop offset="100%" stop-color="${pair[1]}"/>
-    </linearGradient>`).join('\n    ')}
-
-    <!-- AI Card Left Accent Gradient -->
-    <linearGradient id="aiCardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <radialGradient id="amb" cx="0" cy="0" r="800" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#F8FAFC"/>
-      <stop offset="100%" stop-color="#EEF2FF"/>
-    </linearGradient>
-    <linearGradient id="aiAccentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#6366F1"/>
-      <stop offset="50%" stop-color="#1A6EFF"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-
-    <!-- Drop Shadow Filter -->
-    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.04"/>
-      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.02"/>
-    </filter>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </radialGradient>
+    <radialGradient id="amb2" cx="${W}" cy="${H}" r="600" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
-  <!-- ── 1. BACKGROUND & AMBIENT MESH ────────────────────────────────────── -->
+  <!-- Canvas -->
   <rect width="${W}" height="${H}" fill="${C.bg}"/>
-  <rect width="${W}" height="${H}" fill="url(#meshTop)"/>
-  <rect width="${W}" height="${H}" fill="url(#meshBottom)"/>
+  <rect width="${W}" height="${H}" fill="url(#amb)" opacity="0.6"/>
+  <rect width="${W}" height="${H}" fill="url(#amb2)" opacity="0.5"/>
 
-  <!-- Top Hero Color Ribbon -->
-  <rect width="${W}" height="8" fill="url(#heroGrad)"/>
+  <!-- ── HEADER ───────────────────────────────────────────────────────────── -->
 
-  <!-- ── 2. HEADER WITH OFFICIAL LOGO & REPORT PERIOD ────────────────────── -->
-  ${renderMonevoLogoSvg(MX, 44, true)}
+  <text x="${MX}" y="116"
+    font-size="28" font-weight="700" fill="${C.textPrimary}" letter-spacing="-0.5"
+    >monevo<tspan fill="${C.blue}">.</tspan></text>
 
-  <!-- Report Title & Period badge -->
-  <g transform="translate(${RX - 320}, 40)">
-    <rect width="320" height="58" rx="14" fill="#F8FAFC" stroke="${C.border}" stroke-width="1.2"/>
-    <text x="302" y="24" font-size="10" font-weight="800" fill="${C.textMuted}" text-anchor="end" letter-spacing="2.5">WEEKLY FINANCIAL INTELLIGENCE</text>
-    <text x="302" y="45" font-size="14" font-weight="700" fill="${C.blueDark}" text-anchor="end" letter-spacing="0.5">${period}</text>
-  </g>
+  <text x="${RX}" y="98"
+    font-size="10" font-weight="700" fill="${C.textMuted}" text-anchor="end" letter-spacing="3"
+    >WEEKLY FINANCIAL INTELLIGENCE</text>
 
-  <!-- Recipient Profile Tag -->
-  <text x="${MX}" y="124" font-size="15" font-weight="700" fill="${C.textPrimary}">${displayName}</text>
-  <rect x="${MX + 180}" y="110" width="60" height="20" rx="10" fill="#F1F5F9" stroke="${C.border}" stroke-width="1"/>
-  <text x="${MX + 210}" y="124" font-size="10" font-weight="800" fill="${C.textMuted}" text-anchor="middle" letter-spacing="1">${currency}</text>
+  <text x="${RX}" y="120"
+    font-size="14" font-weight="600" fill="${C.textMid}" text-anchor="end"
+    >${period}</text>
 
-  <!-- ── 3. HERO NET CASHFLOW CARD ────────────────────────────────────────── -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX}" y="146" width="${CARD_W}" height="200" rx="22" fill="${netBgGrad}" stroke="${isNetPositive ? '#A7F3D0' : '#FECDD3'}" stroke-width="1.4"/>
-  </g>
+  <!-- Recipient name -->
+  <text x="${MX}" y="140"
+    font-size="14" font-weight="600" fill="${C.textMid}"
+    >${displayName}</text>
 
-  <!-- Net Cashflow Label & Status Pill -->
-  <text x="${MX + 36}" y="186" font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3">NET CASHFLOW</text>
-  
-  <g transform="translate(${RX - 180}, 166)">
-    <rect width="144" height="28" rx="14" fill="${isNetPositive ? 'url(#incomeGrad)' : 'url(#expenseGrad)'}"/>
-    <text x="72" y="19" font-size="11" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">
-      ${isNetPositive ? '↗ SURPLUS' : '↘ DEFICIT'}
-    </text>
-  </g>
+  <!-- Currency badge -->
+  <rect x="${MX}" y="154" width="52" height="22" rx="11" fill="${C.borderFaint}" stroke="${C.border}" stroke-width="1"/>
+  <text x="${MX + 26}" y="169"
+    font-size="10" font-weight="700" fill="${C.textMuted}" text-anchor="middle" letter-spacing="1.5"
+    >${currency}</text>
 
-  <!-- Hero Net Amount -->
-  <text x="${MX + 36}" y="${192 + netFS}" font-size="${netFS}" font-weight="800" fill="${netColor}" letter-spacing="-2">
-    ${netSign}${formattedNet}
-  </text>
+  <line x1="${MX}" y1="${HEADER_RULE}" x2="${RX}" y2="${HEADER_RULE}" stroke="${C.border}" stroke-width="1"/>
 
-  <!-- Subtitle briefing -->
-  <text x="${MX + 36}" y="324" font-size="14" font-weight="500" fill="${C.textMuted}">
-    ${escapeXml(briefText)} • ${data.transactionCount} transactions logged
-  </text>
+  <!-- ── NET CASHFLOW ──────────────────────────────────────────────────────── -->
 
-  <!-- ── 4. INFLOW VS OUTFLOW SPLIT CARDS ─────────────────────────────────── -->
-  <!-- Total Income Card -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX}" y="362" width="${(CARD_W - 20) / 2}" height="120" rx="18" fill="#FFFFFF" stroke="#D1FAE5" stroke-width="1.2"/>
-  </g>
-  <circle cx="${MX + 34}" cy="396" r="14" fill="#ECFDF5"/>
-  <text x="${MX + 34}" y="401" font-size="12" text-anchor="middle">🟢</text>
-  <text x="${MX + 58}" y="400" font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="2">TOTAL INFLOW</text>
-  <text x="${MX + 34}" y="454" font-size="28" font-weight="800" fill="${C.greenDark}" letter-spacing="-1">
-    +${escapeXml(data.formattedIncome)}
-  </text>
+  <text x="${MX}" y="${NET_LABEL_Y}"
+    font-size="10" font-weight="700" fill="${C.textMuted}" letter-spacing="3"
+    >NET CASHFLOW</text>
 
-  <!-- Total Expenses Card -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX + (CARD_W + 20) / 2}" y="362" width="${(CARD_W - 20) / 2}" height="120" rx="18" fill="#FFFFFF" stroke="#FFE4E6" stroke-width="1.2"/>
-  </g>
-  <circle cx="${MX + (CARD_W + 20) / 2 + 34}" cy="396" r="14" fill="#FFF1F2"/>
-  <text x="${MX + (CARD_W + 20) / 2 + 34}" y="401" font-size="12" text-anchor="middle">🔴</text>
-  <text x="${MX + (CARD_W + 20) / 2 + 58}" y="400" font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="2">TOTAL OUTFLOW</text>
-  <text x="${MX + (CARD_W + 20) / 2 + 34}" y="454" font-size="28" font-weight="800" fill="${C.redDark}" letter-spacing="-1">
-    −${escapeXml(data.formattedExpenses)}
-  </text>
+  <text x="${MX}" y="${NET_AMT_Y}"
+    font-size="${netFS}" font-weight="700" fill="${netColor}" letter-spacing="-1.5"
+    >${netSign}${formattedAmount}</text>
 
-  <!-- ── 5. CASHFLOW RATIO DUAL-TONE BAR ─────────────────────────────────── -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX}" y="498" width="${CARD_W}" height="90" rx="18" fill="#FFFFFF" stroke="${C.border}" stroke-width="1.2"/>
-  </g>
-  <text x="${MX + 36}" y="528" font-size="10" font-weight="800" fill="${C.textMuted}" letter-spacing="2.5">CASHFLOW BALANCE RATIO</text>
-  ${totalVol === 0 ? `
-  <text x="${MX + 36}" y="555" font-size="15" font-weight="500" fill="${C.textMuted}">
-    No cashflow activity recorded this period.
-  </text>` : `
-  <text x="${RX - 36}" y="528" font-size="12" font-weight="700" fill="${C.textPrimary}" text-anchor="end">
-    Inflow ${incPct}%  •  Outflow ${expPct}%
-  </text>
-  <!-- Dual progress bar -->
-  <rect x="${MX + 36}" y="542" width="${ratioBarW}" height="16" rx="8" fill="#F1F5F9"/>
-  <rect x="${MX + 36}" y="542" width="${incBarW}" height="16" rx="8" fill="url(#incomeGrad)"/>
-  <rect x="${MX + 36 + incBarW}" y="542" width="${ratioBarW - incBarW}" height="16" rx="8" fill="url(#expenseGrad)"/>
-  `}
+  <!-- Income column -->
+  <text x="${MX}" y="${SPLIT_Y}"
+    font-size="22" font-weight="700" fill="${C.green}"
+    >+${escapeXml(data.formattedIncome)}</text>
+  <text x="${MX + 12}" y="${SPLIT_LBL_Y}"
+    font-size="10" font-weight="700" fill="${C.textMuted}" letter-spacing="2"
+    >INCOME</text>
 
-  <!-- ── 6. TOP SPENDING CATEGORIES BREAKDOWN ────────────────────────────── -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX}" y="604" width="${CARD_W}" height="${Math.max(340, catEndY - 570)}" rx="20" fill="#FFFFFF" stroke="${C.border}" stroke-width="1.2"/>
-  </g>
-  <text x="${MX + 36}" y="642" font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3">TOP EXPENSE CATEGORIES</text>
-  <line x1="${MX + 36}" y1="656" x2="${RX - 36}" y2="656" stroke="${C.borderFaint}" stroke-width="1.2"/>
-  
+  <!-- Expense column -->
+  <text x="${MX + 360}" y="${SPLIT_Y}"
+    font-size="22" font-weight="700" fill="${C.red}"
+    >−${escapeXml(data.formattedExpenses)}</text>
+  <text x="${MX + 372}" y="${SPLIT_LBL_Y}"
+    font-size="10" font-weight="700" fill="${C.textMuted}" letter-spacing="2"
+    >EXPENSES</text>
+
+  <!-- Brief insight -->
+  <text x="${MX}" y="${BRIEF_Y}"
+    font-size="17" font-weight="400" fill="${C.textMuted}" font-style="italic"
+    >${escapeXml(briefText)}</text>
+
+  <line x1="${MX}" y1="${RULE1_Y}" x2="${RX}" y2="${RULE1_Y}" stroke="${C.border}" stroke-width="1"/>
+
+  <!-- ── CASHFLOW BREAKDOWN ────────────────────────────────────────────────── -->
+
+  <text x="${MX}" y="${CF_LABEL_Y}"
+    font-size="10" font-weight="700" fill="${C.textMuted}" letter-spacing="3"
+    >CASHFLOW BREAKDOWN</text>
+  ${cashflowSvg}
+
+  <line x1="${MX}" y1="${RULE2_Y}" x2="${RX}" y2="${RULE2_Y}" stroke="${C.border}" stroke-width="1"/>
+
+  <!-- ── WHERE YOUR MONEY WENT ────────────────────────────────────────────── -->
+
+  <text x="${MX}" y="${CAT_LABEL_Y}"
+    font-size="10" font-weight="700" fill="${C.textMuted}" letter-spacing="3"
+    >WHERE YOUR MONEY WENT</text>
   ${catSvg}
 
-  <!-- ── 7. MONEVO AI FINANCIAL INTELLIGENCE INSIGHT ─────────────────────── -->
-  <g filter="url(#softShadow)">
-    <rect x="${MX}" y="${AI_CARD_Y}" width="${CARD_W}" height="${AI_CARD_H}" rx="20" fill="url(#aiCardGrad)" stroke="#C7D2FE" stroke-width="1.4"/>
-  </g>
-  <!-- Iridescent left accent strip -->
-  <rect x="${MX}" y="${AI_CARD_Y}" width="8" height="${AI_CARD_H}" rx="4" fill="url(#aiAccentGrad)"/>
+  <line x1="${MX}" y1="${RULE3_Y}" x2="${RX}" y2="${RULE3_Y}" stroke="${C.border}" stroke-width="1"/>
 
-  <!-- AI Badge -->
-  <g transform="translate(${MX + 34}, ${AI_CARD_Y + 28})">
-    <rect width="180" height="26" rx="13" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
-    <text x="14" y="17" font-size="12">✨</text>
-    <text x="32" y="17" font-size="10" font-weight="800" fill="${C.indigoDark}" letter-spacing="1.5">MONEVO AI INSIGHT</text>
-  </g>
+  <!-- ── MONEVO SAYS ──────────────────────────────────────────────────────── -->
 
-  <!-- AI Insight text lines -->
-  <text x="${MX + 34}" y="${AI_CARD_Y + 84}" font-size="17" font-weight="600" fill="${C.textPrimary}">
-    ${fullLines.map((l, i) => `<tspan x="${MX + 34}" dy="${i === 0 ? '0' : '26'}">${escapeXml(l)}</tspan>`).join('')}
-  </text>
+  <text x="${MX}" y="${AI_LABEL_Y}"
+    font-size="10" font-weight="700" fill="${C.blue}" letter-spacing="3"
+    >MONEVO SAYS</text>
 
-  <!-- ── 8. DIGITAL FOOTER ───────────────────────────────────────────────── -->
-  <line x1="${MX}" y1="1264" x2="${RX}" y2="1264" stroke="${C.border}" stroke-width="1"/>
-  <text x="${MX}" y="1300" font-size="12" font-weight="600" fill="${C.textMuted}">
-    monevo.ai • Automated Financial Intelligence Report • ${escapeXml(data.generatedAtStr)}
-  </text>
-  <text x="${RX}" y="1300" font-size="12" font-weight="600" fill="${C.textMuted}" text-anchor="end">
-    Confidential &amp; Verified
-  </text>
+  ${fullLines.map((line, i) =>
+    `<text x="${MX}" y="${AI_TEXT_Y + i * 34}"
+    font-size="20" font-weight="500" fill="${C.textPrimary}"
+    >${escapeXml(line)}</text>`
+  ).join('\n  ')}
 
-  <!-- Bottom Gradient Accent Bar -->
-  <rect y="${H - 6}" width="${W}" height="6" fill="url(#heroGrad)"/>
+  <!-- ── FOOTER ────────────────────────────────────────────────────────────── -->
+
+  <line x1="${MX}" y1="${FOOTER_RULE}" x2="${RX}" y2="${FOOTER_RULE}" stroke="${C.border}" stroke-width="1"/>
+
+  <text x="${MX}" y="${FOOTER_TXT}"
+    font-size="12" font-weight="400" fill="${C.textGhost}"
+    >${data.transactionCount} transaction${data.transactionCount === 1 ? '' : 's'} · ${period}</text>
+
+  <text x="${MX}" y="${FOOTER_TXT + 24}"
+    font-size="11" font-weight="400" fill="${C.textGhost}"
+    >Generated ${escapeXml(data.generatedAtStr)} · Monevo Financial Intelligence</text>
+
+  <text x="${RX}" y="${FOOTER_TXT}"
+    font-size="16" font-weight="700" fill="${C.textGhost}" text-anchor="end" letter-spacing="-0.3"
+    >monevo<tspan fill="${C.blue}">.</tspan></text>
+
 </svg>`;
 }
+
+

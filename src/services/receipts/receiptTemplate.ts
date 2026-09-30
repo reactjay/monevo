@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Monevo Receipt Template — 1080 × 1350 WhatsApp Visual Format
-// Premium Gradient Fintech Design · Professional Worldwide Standard
+// Exact Editorial Fintech Layout in Pure White / Light Theme
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface ReceiptTemplateData {
@@ -21,7 +21,7 @@ export interface ReceiptTemplateData {
   status?: string;
 }
 
-// ── Premium Gradient Fintech Palette ─────────────────────────────────────────
+// ── Pure White / Light Theme Palette ──────────────────────────────────────────
 const C = {
   bg:          '#FFFFFF',
   border:      '#E2E8F0',
@@ -36,10 +36,6 @@ const C = {
   green:       '#16A34A',
   greenBg:     '#DCFCE7',
   amb1:        '#F8FAFC',
-  indigo:      '#6366F1',
-  cyan:        '#06B6D4',
-  greenLight:  '#4ADE80',
-  bluePanel:   '#EFF6FF',
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -116,7 +112,7 @@ function fingerprint(receiptNumber: string, x0: number, cy: number, width: numbe
   }
 
   return [
-    `<path d="${d}" fill="none" stroke="url(#brandGrad)" stroke-width="3.5" opacity="0.1"/>`,
+    `<path d="${d}" fill="none" stroke="${C.blue}" stroke-width="3" opacity="0.12"/>`,
     `<path d="${d}" fill="none" stroke="${C.blue}" stroke-width="1.6" opacity="0.38"/>`,
   ].join('\n  ');
 }
@@ -229,52 +225,10 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
   font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
 
   <defs>
-    <!-- Brand gradient: indigo → blue → cyan -->
-    <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${C.indigo}"/>
-      <stop offset="50%" stop-color="${C.blue}"/>
-      <stop offset="100%" stop-color="${C.cyan}"/>
-    </linearGradient>
-
-    <!-- Ambient background gradient -->
-    <linearGradient id="amb" x1="0" y1="0" x2="0.2" y2="1">
-      <stop offset="0%" stop-color="${C.amb1}"/>
-      <stop offset="50%" stop-color="#FFFFFF"/>
+    <!-- Subtle cool-white gradient background -->
+    <linearGradient id="amb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="100%" stop-color="${C.amb1}"/>
-    </linearGradient>
-
-    <!-- Amount panel frosted gradient -->
-    <linearGradient id="amtPanel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${C.bluePanel}"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-    </linearGradient>
-
-    <!-- Status pill gradient -->
-    <linearGradient id="statusGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${C.greenLight}"/>
-      <stop offset="100%" stop-color="${C.green}"/>
-    </linearGradient>
-
-    <!-- Transaction flow line gradient -->
-    <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${C.border}"/>
-      <stop offset="25%" stop-color="${C.blueDim}"/>
-      <stop offset="50%" stop-color="${C.blue}"/>
-      <stop offset="75%" stop-color="${C.blueDim}"/>
-      <stop offset="100%" stop-color="${C.border}"/>
-    </linearGradient>
-
-    <!-- Node glow radial -->
-    <radialGradient id="nodeGlow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0%" stop-color="${C.blue}"/>
-      <stop offset="100%" stop-color="${C.blue}" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Footer gradient rule -->
-    <linearGradient id="footerGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${C.indigo}" stop-opacity="0.4"/>
-      <stop offset="50%" stop-color="${C.blue}" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="${C.cyan}" stop-opacity="0.4"/>
     </linearGradient>
   </defs>
 
@@ -282,14 +236,13 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
   <rect width="${W}" height="${H}" fill="${C.bg}"/>
   <rect width="${W}" height="${H}" fill="url(#amb)" opacity="0.7"/>
 
-  <!-- Premium brand gradient bar -->
-  <rect width="${W}" height="6" fill="url(#brandGrad)"/>
-
-  <!-- ── 2. HEADER ───────────────────────────────────────────────────────── -->
+  <!-- ── 2. HEADER (Exact match to reference layout) ──────────────────────── -->
+  <!-- monevo. brand wordmark (top left) -->
   <text x="${MX}" y="118"
     font-size="34" font-weight="800" fill="${C.textPrimary}" letter-spacing="-0.8"
     >monevo<tspan fill="${C.blue}">.</tspan></text>
 
+  <!-- TRANSACTION RECEIPT label + reference (top right) -->
   <text x="${RX}" y="100"
     font-size="11" font-weight="800" fill="${C.textMuted}" text-anchor="end" letter-spacing="3"
     >TRANSACTION RECEIPT</text>
@@ -298,54 +251,60 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
     >${receiptNum}</text>
 
   <!-- ── 3. AMOUNT DISPLAY ───────────────────────────────────────────────── -->
-  <!-- Frosted amount panel -->
-  <rect x="${MX - 20}" y="185" width="${RX - MX + 40}" height="${amtFS + 80}" rx="16" fill="url(#amtPanel)" opacity="0.5"/>
-
+  <!-- AMOUNT label -->
   <text x="${MX}" y="206"
     font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3"
     >AMOUNT</text>
 
+  <!-- Amount display (large & bold) -->
   <text x="${MX}" y="${218 + amtFS}"
     font-size="${amtFS}" font-weight="800" fill="${C.textPrimary}" letter-spacing="-2.5"
     >${formattedAmount}</text>
 
-  <!-- Gradient status pill -->
-  <rect x="${MX}" y="${218 + amtFS + 22}" width="72" height="28" rx="14" fill="url(#statusGrad)"/>
+  <!-- Status pill -->
+  <rect x="${MX}" y="${218 + amtFS + 22}" width="72" height="28" rx="14" fill="${C.greenBg}"/>
   <text x="${MX + 36}" y="${218 + amtFS + 41}"
-    font-size="11" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="2"
+    font-size="11" font-weight="800" fill="${C.green}" text-anchor="middle" letter-spacing="2"
     >${status}</text>
 
+  <!-- Date · time -->
   <text x="${MX + 92}" y="${218 + amtFS + 41}"
     font-size="16" font-weight="500" fill="${C.textMuted}"
     >${dateTimeStr}</text>
 
   <!-- ── 4. TRANSACTION FLOW ─────────────────────────────────────────────── -->
+  <!-- FROM label -->
   <text x="${MX}" y="455"
     font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3">FROM</text>
 
+  <!-- TO label -->
   <text x="${RX}" y="455"
     font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3" text-anchor="end">TO</text>
 
+  <!-- VIA label -->
   <text x="540" y="455"
     font-size="11" font-weight="800" fill="${C.textMuted}" letter-spacing="3" text-anchor="middle">VIA</text>
 
+  <!-- Payer name -->
   <text x="${MX}" y="492"
     font-size="28" font-weight="700" fill="${C.textPrimary}">${payer}</text>
 
+  <!-- monevo. brand node -->
   <text x="540" y="492"
     font-size="22" font-weight="800" fill="${C.blue}" text-anchor="middle"
     letter-spacing="-0.3">monevo<tspan fill="${C.blueDim}">.</tspan></text>
 
+  <!-- Recipient name -->
   <text x="${RX}" y="492"
     font-size="28" font-weight="700" fill="${C.textPrimary}" text-anchor="end">${recipient}</text>
-  <!-- Connecting ledger line -->
-  <line x1="${MX}" y1="504" x2="${RX}" y2="504" stroke="url(#flowGrad)" stroke-width="1.8"/>
 
-  <!-- Node dots with subtle glow -->
-  <circle cx="${MX}" cy="504" r="5" fill="${C.indigo}"/>
-  <circle cx="540" cy="504" r="16" fill="url(#nodeGlow)" opacity="0.3"/>
-  <circle cx="540" cy="504" r="6" fill="${C.blue}"/>
-  <circle cx="${RX}" cy="504" r="5" fill="${C.cyan}"/>
+  <!-- Connecting ledger line -->
+  <line x1="${MX}" y1="504" x2="${RX}" y2="504" stroke="${C.borderFaint}" stroke-width="1.5"/>
+
+  <!-- Node dots -->
+  <circle cx="${MX}" cy="504" r="4" fill="${C.border}"/>
+  <circle cx="540" cy="504" r="5" fill="${C.blue}" opacity="0.9"/>
+  <circle cx="${RX}" cy="504" r="4" fill="${C.border}"/>
 
   <!-- Transaction fingerprint waveform -->
   ${fpSvg}
@@ -389,7 +348,7 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
     font-size="14" font-weight="500" fill="${C.textMid}">${escapeXml(dateTimeStr)}</text>
 
   <!-- ── 7. FOOTER ────────────────────────────────────────────────────────── -->
-  <line x1="${MX}" y1="${FOOTER_Y}" x2="${RX}" y2="${FOOTER_Y}" stroke="url(#footerGrad)" stroke-width="1.5"/>
+  <line x1="${MX}" y1="${FOOTER_Y}" x2="${RX}" y2="${FOOTER_Y}" stroke="${C.borderFaint}" stroke-width="1.2"/>
 
   <text x="${MX}" y="${FOOTER_Y + 36}"
     font-size="13" font-weight="500" fill="${C.textGhost}"
@@ -406,3 +365,5 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
 
 </svg>`;
 }
+
+
