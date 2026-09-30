@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monevo Admin — Intelligence & Operations Command</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- ── Sidebar Navigation ────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">M</div>
+        <div class="brand-info">
+          <div class="brand-name">monevo<span>.</span></div>
+          <div class="brand-tag">Operations Hub</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">CORE INTELLIGENCE</div>
+        <button class="nav-item active" data-tab="overview">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Overview</span>
+        </button>
+        <button class="nav-item voice-highlight" data-tab="voice">
+          <span class="nav-icon">🎙️</span>
+          <span class="nav-label">Voice Users & STT</span>
+          <span class="nav-badge" id="sidebarVoiceBadge">LIVE</span>
+        </button>
+        <button class="nav-item" data-tab="users">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Users CRM</span>
+          <span class="nav-badge-count" id="sidebarUserCount">0</span>
+        </button>
+        <button class="nav-item" data-tab="transactions">
+          <span class="nav-icon">💳</span>
+          <span class="nav-label">Transactions</span>
+        </button>
+
+        <div class="nav-section-title">OUTPUTS & SYSTEM</div>
+        <button class="nav-item" data-tab="receipts">
+          <span class="nav-icon">🧾</span>
+          <span class="nav-label">Receipts Hub</span>
+        </button>
+        <button class="nav-item" data-tab="reports">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Weekly Reports</span>
+        </button>
+        <button class="nav-item" data-tab="system">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">System Health</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="engine-badge">
+          <div class="engine-indicator"></div>
+          <div class="engine-details">
+            <span class="engine-name">AssemblyAI + Meta</span>
+            <span class="engine-status" id="engineStatusText">Active Engine</span>
+          </div>
+        </div>
+        <a href="/demo" target="_blank" class="sidebar-link-btn" title="Open Monevo Demo Studio">
+          <span>🎬 Open Demo Studio</span>
+          <span class="external-arrow">↗</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ── Main Content Area ────────────────────────────────────── -->
+    <main class="main-content">
+      <!-- Top Navbar -->
+      <header class="top-nav">
+        <div class="nav-left">
+          <h1 class="page-title" id="pageTitle">Operations Overview</h1>
+          <span class="live-pill">
+            <span class="pulse-dot"></span>
+            <span id="dataModePill">Connecting...</span>
+          </span>
+        </div>
+
+        <div class="nav-actions">
+          <!-- Global Search -->
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearchInput" placeholder="Quick search phone, user, transcript...">
+          </div>
+
+          <!-- Auto-refresh interval toggle -->
+          <div class="refresh-control">
+            <button class="btn btn-secondary btn-icon" id="manualRefreshBtn" title="Refresh Now">
+              🔄
+            </button>
+            <select id="autoRefreshSelect" class="select-dropdown" title="Auto-refresh Interval">
+              <option value="10">Auto: 10s</option>
+              <option value="30" selected>Auto: 30s</option>
+              <option value="60">Auto: 60s</option>
+              <option value="0">Auto: Off</option>
+            </select>
+          </div>
+
+          <!-- Export Menu -->
+          <div class="dropdown-wrapper">
+            <button class="btn btn-primary" id="exportMenuBtn">
+              📥 Export CSV ▾
+            </button>
+            <div class="dropdown-menu" id="exportDropdown">
+              <button class="dropdown-item" onclick="AdminApp.exportData('transactions')">
+                💳 All Transactions CSV
+              </button>
+              <button class="dropdown-item" onclick="AdminApp.exportData('voice-logs')">
+                🎙️ Voice Transcripts CSV
+              </button>
+              <button class="dropdown-item" onclick="AdminApp.exportData('users')">
+                👥 Users Roster CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic Page Container -->
+      <div class="content-body">
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 1: OVERVIEW -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-overview" class="tab-pane active">
+          <!-- Top KPI Ribbon -->
+          <div class="kpi-grid">
+            <!-- Total Users -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Users</span>
+                <span class="kpi-icon-pill blue">👥</span>
+              </div>
+              <div class="kpi-value" id="kpiTotalUsers">0</div>
+              <div class="kpi-subtitle">
+                <span class="sub-highlight" id="kpiOnboardedUsers">0</span> onboarded &bull;
+                <span id="kpiBusinessUsers">0</span> business
+              </div>
+            </div>
+
+            <!-- Voice Users & Adoption -->
+            <div class="kpi-card glowing-cyan">
+              <div class="kpi-header">
+                <span class="kpi-title">Voice-Active Users</span>
+                <span class="kpi-icon-pill cyan">🎙️</span>
+              </div>
+              <div class="kpi-value cyan" id="kpiVoiceUsers">0</div>
+              <div class="kpi-subtitle">
+                <span class="sub-highlight cyan" id="kpiVoiceModeUsers">0</span> in voice reply mode &bull;
+                <span id="kpiVoiceShare">0%</span> voice share
+              </div>
+            </div>
+
+            <!-- Total Volume / Gross -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Gross Volume</span>
+                <span class="kpi-icon-pill green">💰</span>
+              </div>
+              <div class="kpi-value green" id="kpiGrossVolume">₦0</div>
+              <div class="kpi-subtitle">
+                <span class="text-income">↑ ₦<span id="kpiTotalIncome">0</span></span> &bull;
+                <span class="text-expense">↓ ₦<span id="kpiTotalExpense">0</span></span>
+              </div>
+            </div>
+
+            <!-- Net Cash Flow -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Net Ledger Balance</span>
+                <span class="kpi-icon-pill purple">⚖️</span>
+              </div>
+              <div class="kpi-value" id="kpiNetBalance">₦0</div>
+              <div class="kpi-subtitle">
+                Across <span id="kpiTotalTransactions">0</span> total transactions
+              </div>
+            </div>
+
+            <!-- Voice vs Text Transactions -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Voice Notes Processed</span>
+                <span class="kpi-icon-pill amber">⚡</span>
+              </div>
+              <div class="kpi-value amber" id="kpiVoiceTransactions">0</div>
+              <div class="kpi-subtitle">
+                AssemblyAI STT &bull; <span id="kpiTextTransactions">0</span> text notes
+              </div>
+            </div>
+
+            <!-- Receipts & Output -->
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Receipts & Reports</span>
+                <span class="kpi-icon-pill rose">🧾</span>
+              </div>
+              <div class="kpi-value" id="kpiTotalReceipts">0</div>
+              <div class="kpi-subtitle">
+                <span id="kpiTotalReports">0</span> weekly summaries dispatched
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Split: Voice Adoption Bar & Cashflow Trends -->
+          <div class="dashboard-split">
+            <!-- Voice Adoption Card -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">🎙️ Voice vs. Text Engagement</h3>
+                  <span class="card-subtitle">Transactions logged by input modality</span>
+                </div>
+                <span class="card-badge cyan" id="voiceAdoptionBadge">0% Voice</span>
+              </div>
+              
+              <div class="voice-progress-container">
+                <div class="progress-bar-wrap">
+                  <div class="progress-fill voice" id="voiceProgressFill" style="width: 50%;"></div>
+                  <div class="progress-fill text" id="textProgressFill" style="width: 50%;"></div>
+                </div>
+                <div class="progress-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot cyan"></span>
+                    <span>Voice Notes (AssemblyAI): <strong id="voiceLegendVal">0</strong></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot purple"></span>
+                    <span>Text Messages: <strong id="textLegendVal">0</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Voice Highlights List -->
+              <div class="voice-highlight-box">
+                <div class="vh-item">
+                  <span class="vh-label">Voice Transcription Model</span>
+                  <span class="vh-val">AssemblyAI Universal STT</span>
+                </div>
+                <div class="vh-item">
+                  <span class="vh-label">Nigerian English / Pidgin</span>
+                  <span class="vh-val text-green">✓ Supported & Normalized</span>
+                </div>
+                <div class="vh-item">
+                  <span class="vh-label">Neural Audio Response Mode</span>
+                  <span class="vh-val" id="vhVoiceModeUsers">0 active users</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Categories Spoken & Logged -->
+            <div class="glass-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <h3 class="card-title">📊 Top Activity Categories</h3>
+                  <span class="card-subtitle">Spending and income channels</span>
+                </div>
+                <span class="card-badge">Top Channels</span>
+              </div>
+
+              <div class="category-bars-list" id="overviewCategoryBars">
+                <!-- Dynamically populated -->
+                <div class="empty-state-sm">Loading category distribution...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom: Live Feed of Recent Transactions & Transcripts -->
+          <div class="glass-card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">⚡ Real-Time Transaction & Voice Stream</h3>
+                <span class="card-subtitle">Latest entries flowing through Monevo bot</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="AdminApp.switchTab('transactions')">
+                View All Transactions →
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>User</th>
+                    <th>Source</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Transcript / Note</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="overviewRecentTxBody">
+                  <tr><td colspan="8" class="text-center">Loading transactions...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 2: VOICE USERS & SPEECH INTELLIGENCE -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-voice" class="tab-pane">
+          <!-- Voice Hero Banner -->
+          <div class="voice-hero-banner">
+            <div class="voice-banner-left">
+              <div class="voice-avatar-ring">🎙️</div>
+              <div>
+                <h2 class="voice-banner-title">Voice Intelligence Hub (AssemblyAI STT)</h2>
+                <p class="voice-banner-desc">
+                  Monevo turns raw WhatsApp audio notes into structured, audited financial records.
+                  Explore voice users, full transcript records, speech entity extractions, and reply modes.
+                </p>
+              </div>
+            </div>
+            <div class="voice-banner-stats">
+              <div class="vb-stat">
+                <div class="vb-num" id="vbVoiceUsers">0</div>
+                <div class="vb-label">Voice Users</div>
+              </div>
+              <div class="vb-stat">
+                <div class="vb-num cyan" id="vbVoiceVolume">₦0</div>
+                <div class="vb-label">Transacted via Voice</div>
+              </div>
+              <div class="vb-stat">
+                <div class="vb-num" id="vbVoiceModeCount">0</div>
+                <div class="vb-label">Voice-Reply Mode</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice Users Directory -->
+          <div class="glass-card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🎙️ All Voice-Active Users</h3>
+                <span class="card-subtitle">Users who have logged transactions via voice notes or enabled voice response</span>
+              </div>
+              <span class="card-badge cyan" id="voiceUserRosterCount">0 Users</span>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User / Business</th>
+                    <th>WhatsApp ID / Phone</th>
+                    <th>Profile Type</th>
+                    <th>Response Mode</th>
+                    <th>Voice Notes Sent</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="voiceUsersTableBody">
+                  <tr><td colspan="7" class="text-center">Loading voice users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AssemblyAI Speech Transcripts Feed -->
+          <div class="glass-card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🗣️ AssemblyAI Transcription Feed</h3>
+                <span class="card-subtitle">Raw voice notes received and decoded from WhatsApp audio</span>
+              </div>
+              <span class="card-badge cyan">Speech-To-Text Logs</span>
+            </div>
+
+            <div class="transcript-feed-list" id="transcriptsFeedList">
+              <div class="empty-state-sm">Loading voice transcripts...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 3: USERS CRM -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-users" class="tab-pane">
+          <!-- Users Filters Toolbar -->
+          <div class="toolbar-card">
+            <div class="filter-group">
+              <button class="filter-pill active" data-user-filter="all">All Users (<span id="countAllUsers">0</span>)</button>
+              <button class="filter-pill" data-user-filter="voice">🎙️ Voice Mode (<span id="countVoiceUsers">0</span>)</button>
+              <button class="filter-pill" data-user-filter="business">🏢 Business (<span id="countBusinessUsers">0</span>)</button>
+              <button class="filter-pill" data-user-filter="personal">👤 Personal (<span id="countPersonalUsers">0</span>)</button>
+              <button class="filter-pill" data-user-filter="onboarded">✅ Onboarded</button>
+            </div>
+
+            <div class="toolbar-search">
+              <input type="text" id="userTableSearch" placeholder="Filter users by name, phone, or business...">
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="glass-card mt-4">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User Name</th>
+                    <th>WhatsApp ID / Phone</th>
+                    <th>Type</th>
+                    <th>Business Name</th>
+                    <th>Mode</th>
+                    <th>Total Txs</th>
+                    <th>Voice Txs</th>
+                    <th>Balance</th>
+                    <th>Onboarded</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr><td colspan="10" class="text-center">Loading users directory...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <span id="userPaginationText">Showing users...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 4: TRANSACTIONS LEDGER -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-transactions" class="tab-pane">
+          <!-- Transactions Filter Toolbar -->
+          <div class="toolbar-card">
+            <div class="filter-group">
+              <button class="filter-pill active" data-tx-source="all">All Channels</button>
+              <button class="filter-pill" data-tx-source="voice">🎙️ Voice Notes Only</button>
+              <button class="filter-pill" data-tx-source="text">💬 Text Only</button>
+              <button class="filter-pill" data-tx-type="income">↑ Incomes</button>
+              <button class="filter-pill" data-tx-type="expense">↓ Expenses</button>
+            </div>
+
+            <div class="toolbar-search">
+              <input type="text" id="txTableSearch" placeholder="Search note, category, counterparty, transcript...">
+            </div>
+          </div>
+
+          <!-- Transactions Table -->
+          <div class="glass-card mt-4">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Source</th>
+                    <th>Category</th>
+                    <th>Description / Details</th>
+                    <th>Transcript</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                  <tr><td colspan="9" class="text-center">Loading transactions...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <span id="txPaginationText">Showing transactions...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 5: RECEIPTS HUB -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-receipts" class="tab-pane">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧾 Generated Digital Receipts</h3>
+                <span class="card-subtitle">Official payment confirmations and invoices issued via Monevo</span>
+              </div>
+              <span class="card-badge purple" id="receiptsBadge">0 Receipts</span>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Receipt #</th>
+                    <th>Date Issued</th>
+                    <th>User</th>
+                    <th>Payer</th>
+                    <th>Recipient</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="receiptsTableBody">
+                  <tr><td colspan="8" class="text-center">Loading receipts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 6: WEEKLY REPORTS -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-reports" class="tab-pane">
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📈 Automated Weekly Financial Reports</h3>
+                <span class="card-subtitle">Scheduled financial roundups generated and dispatched via WhatsApp</span>
+              </div>
+              <span class="card-badge" id="reportsBadge">0 Dispatches</span>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Report Period</th>
+                    <th>User</th>
+                    <th>Income</th>
+                    <th>Expenses</th>
+                    <th>Net Balance</th>
+                    <th>Txs Count</th>
+                    <th>Top Spends</th>
+                    <th>Generated At</th>
+                  </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                  <tr><td colspan="8" class="text-center">Loading weekly reports...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- TAB 7: SYSTEM HEALTH & OBSERVABILITY -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section id="tab-system" class="tab-pane">
+          <div class="system-grid">
+            <!-- Server & Environment Card -->
+            <div class="glass-card">
+              <h3 class="card-title mb-3">🖥️ Runtime Environment</h3>
+              <div class="spec-list">
+                <div class="spec-item">
+                  <span class="spec-label">Service</span>
+                  <span class="spec-val">Monevo WhatsApp Core</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Environment</span>
+                  <span class="spec-val" id="sysEnv">development</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Node Engine</span>
+                  <span class="spec-val" id="sysNodeVer">v22.0.0</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Server Uptime</span>
+                  <span class="spec-val text-green" id="sysUptime">0s</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Memory Heap Used</span>
+                  <span class="spec-val" id="sysMemory">0 MB</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Integrations Readiness -->
+            <div class="glass-card">
+              <h3 class="card-title mb-3">🔌 Connected Integrations</h3>
+              <div class="spec-list">
+                <div class="spec-item">
+                  <span class="spec-label">MongoDB Database</span>
+                  <span class="spec-val text-green" id="sysDbStatus">Connected</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">AssemblyAI STT Engine</span>
+                  <span class="spec-val text-cyan" id="sysAssemblyStatus">Configured & Ready</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Meta WhatsApp Cloud / Kapso</span>
+                  <span class="spec-val" id="sysMetaStatus">Active Webhook</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Neural TTS Synthesizer</span>
+                  <span class="spec-val">Edge Neural + Google Fallback</span>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-label">Active Conversation States</span>
+                  <span class="spec-val" id="sysActiveConvs">0 sessions</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Event Logs Feed -->
+          <div class="glass-card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📋 Live Telemetry & Event Audit</h3>
+                <span class="card-subtitle">Real-time webhook events, intent classifications, and delivery statuses</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="AdminApp.clearEventLogs()">Clear Feed</button>
+            </div>
+
+            <div class="terminal-log" id="eventLogsTerminal">
+              <div class="log-entry log-info">
+                <span class="log-time">[System]</span>
+                <span class="log-msg">Admin telemetry session established. Listening for events...</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Slide-over User Profile Drawer ────────────────────────── -->
+  <div class="drawer-overlay" id="userDrawerOverlay">
+    <div class="drawer-content" id="userDrawerContent">
+      <div class="drawer-header">
+        <div>
+          <h2 class="drawer-title" id="drawerUserName">User Profile</h2>
+          <span class="drawer-subtitle" id="drawerUserPhone">+234...</span>
+        </div>
+        <button class="drawer-close-btn" id="drawerCloseBtn">✕</button>
+      </div>
+
+      <div class="drawer-body" id="drawerBody">
+        <!-- Dynamically rendered -->
+        <div class="empty-state-sm">Loading user details...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Transaction / Receipt Inspection Modal ─────────────────── -->
+  <div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Details</h3>
+        <button class="modal-close-btn" id="modalCloseBtn">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Application Script -->
+  <script src="admin.js"></script>
+</body>
+</html>

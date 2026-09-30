@@ -2,16 +2,24 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
 
 import { healthRouter } from './routes/health';
 import { webhookRouter } from './routes/webhook';
+import { adminRouter } from './routes/admin';
 import { notFoundHandler } from './middleware/notFound';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
 // ── Security headers ──────────────────────────────────────────
-app.use(helmet());
+// Configure helmet with relaxed CSP to permit the admin UI assets and styles
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // ── CORS ─────────────────────────────────────────────────────
 app.use(cors());
@@ -25,10 +33,17 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ── Static assets for Admin Dashboard & Demo Studio ──────────
+const publicAdminPath = path.join(__dirname, '../public/admin');
+const demoStudioPath = path.join(__dirname, '../demo-studio');
+app.use('/admin', express.static(publicAdminPath));
+app.use('/demo', express.static(demoStudioPath));
+
 // ── Routes ────────────────────────────────────────────────────
 app.use('/health', healthRouter);
 app.use('/webhook/whatsapp', webhookRouter);
 app.use('/webhook', webhookRouter);
+app.use('/api/admin', adminRouter);
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use(notFoundHandler);
@@ -38,3 +53,4 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 export { app };
+

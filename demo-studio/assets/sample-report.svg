@@ -1,0 +1,183 @@
+<svg width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"
+  font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+
+  <defs>
+    <radialGradient id="amb" cx="0" cy="0" r="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </radialGradient>
+    <radialGradient id="amb2" cx="1080" cy="1350" r="600" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="1080" height="1350" fill="#FFFFFF"/>
+  <rect width="1080" height="1350" fill="url(#amb)" opacity="0.6"/>
+  <rect width="1080" height="1350" fill="url(#amb2)" opacity="0.5"/>
+
+  <!-- ── HEADER ───────────────────────────────────────────────────────────── -->
+
+  <text x="80" y="116"
+    font-size="28" font-weight="700" fill="#0F172A" letter-spacing="-0.5"
+    >monevo<tspan fill="#1A6EFF">.</tspan></text>
+
+  <text x="1000" y="98"
+    font-size="10" font-weight="700" fill="#64748B" text-anchor="end" letter-spacing="3"
+    >WEEKLY FINANCIAL INTELLIGENCE</text>
+
+  <text x="1000" y="120"
+    font-size="14" font-weight="600" fill="#334155" text-anchor="end"
+    >24 Sep — 30 Sep 2026</text>
+
+  <!-- Recipient name -->
+  <text x="80" y="140"
+    font-size="14" font-weight="600" fill="#334155"
+    >Monevo Enterprises</text>
+
+  <!-- Currency badge -->
+  <rect x="80" y="154" width="52" height="22" rx="11" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="106" y="169"
+    font-size="10" font-weight="700" fill="#64748B" text-anchor="middle" letter-spacing="1.5"
+    >NGN</text>
+
+  <line x1="80" y1="172" x2="1000" y2="172" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- ── NET CASHFLOW ──────────────────────────────────────────────────────── -->
+
+  <text x="80" y="218"
+    font-size="10" font-weight="700" fill="#64748B" letter-spacing="3"
+    >NET CASHFLOW</text>
+
+  <text x="80" y="302"
+    font-size="68" font-weight="700" fill="#16A34A" letter-spacing="-1.5"
+    >++₦122,550.00</text>
+
+  <!-- Income column -->
+  <text x="80" y="354"
+    font-size="22" font-weight="700" fill="#16A34A"
+    >+₦185,000.00</text>
+  <text x="92" y="380"
+    font-size="10" font-weight="700" fill="#64748B" letter-spacing="2"
+    >INCOME</text>
+
+  <!-- Expense column -->
+  <text x="440" y="354"
+    font-size="22" font-weight="700" fill="#DC2626"
+    >−₦62,450.00</text>
+  <text x="452" y="380"
+    font-size="10" font-weight="700" fill="#64748B" letter-spacing="2"
+    >EXPENSES</text>
+
+  <!-- Brief insight -->
+  <text x="80" y="422"
+    font-size="17" font-weight="400" fill="#64748B" font-style="italic"
+    >Your net savings grew by +32% this week. Groceries was your primary expense category at 39%.</text>
+
+  <line x1="80" y1="454" x2="1000" y2="454" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- ── CASHFLOW BREAKDOWN ────────────────────────────────────────────────── -->
+
+  <text x="80" y="488"
+    font-size="10" font-weight="700" fill="#64748B" letter-spacing="3"
+    >CASHFLOW BREAKDOWN</text>
+  
+  
+  <!-- Income bar row -->
+  <text x="80" y="528"
+    font-size="12" font-weight="700" fill="#64748B" letter-spacing="2">INCOME</text>
+  <rect x="200" y="516" width="540" height="14" rx="7" fill="#F1F5F9"/>
+  <rect x="200" y="516" width="405" height="14" rx="7" fill="#16A34A"/>
+  <text x="760" y="528"
+    font-size="15" font-weight="700" fill="#16A34A">+₦185,000</text>
+  <text x="760" y="546"
+    font-size="12" font-weight="500" fill="#64748B">75%</text>
+
+  <!-- Expenses bar row -->
+  <text x="80" y="578"
+    font-size="12" font-weight="700" fill="#64748B" letter-spacing="2">EXPENSES</text>
+  <rect x="200" y="566" width="540" height="14" rx="7" fill="#F1F5F9"/>
+  <rect x="200" y="566" width="135" height="14" rx="7" fill="#DC2626"/>
+  <text x="760" y="578"
+    font-size="15" font-weight="700" fill="#DC2626">−₦62,450</text>
+  <text x="760" y="596"
+    font-size="12" font-weight="500" fill="#64748B">25%</text>
+
+  <line x1="80" y1="632" x2="1000" y2="632" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- ── WHERE YOUR MONEY WENT ────────────────────────────────────────────── -->
+
+  <text x="80" y="668"
+    font-size="10" font-weight="700" fill="#64748B" letter-spacing="3"
+    >WHERE YOUR MONEY WENT</text>
+  
+  <!-- Category: Groceries -->
+  <text x="80" y="720"
+    font-size="15" font-weight="600" fill="#0F172A">Groceries</text>
+  <rect x="250" y="708" width="570" height="10" rx="5" fill="#F1F5F9"/>
+  <rect x="250" y="708" width="222" height="10" rx="5" fill="#1A6EFF"/>
+  <text x="840" y="720"
+    font-size="14" font-weight="700" fill="#0F172A">₦24,500</text>
+  <text x="980" y="720"
+    font-size="13" font-weight="500" fill="#64748B">39%</text>
+  <!-- Category: Transport -->
+  <text x="80" y="778"
+    font-size="15" font-weight="600" fill="#0F172A">Transport</text>
+  <rect x="250" y="766" width="570" height="10" rx="5" fill="#F1F5F9"/>
+  <rect x="250" y="766" width="137" height="10" rx="5" fill="#16A34A"/>
+  <text x="840" y="778"
+    font-size="14" font-weight="700" fill="#0F172A">₦15,200</text>
+  <text x="980" y="778"
+    font-size="13" font-weight="500" fill="#64748B">24%</text>
+  <!-- Category: Utilities -->
+  <text x="80" y="836"
+    font-size="15" font-weight="600" fill="#0F172A">Utilities</text>
+  <rect x="250" y="824" width="570" height="10" rx="5" fill="#F1F5F9"/>
+  <rect x="250" y="824" width="114" height="10" rx="5" fill="#8B5CF6"/>
+  <text x="840" y="836"
+    font-size="14" font-weight="700" fill="#0F172A">₦12,750</text>
+  <text x="980" y="836"
+    font-size="13" font-weight="500" fill="#64748B">20%</text>
+  <!-- Category: Inventory -->
+  <text x="80" y="894"
+    font-size="15" font-weight="600" fill="#0F172A">Inventory</text>
+  <rect x="250" y="882" width="570" height="10" rx="5" fill="#F1F5F9"/>
+  <rect x="250" y="882" width="91" height="10" rx="5" fill="#F59E0B"/>
+  <text x="840" y="894"
+    font-size="14" font-weight="700" fill="#0F172A">₦10,000</text>
+  <text x="980" y="894"
+    font-size="13" font-weight="500" fill="#64748B">16%</text>
+
+  <line x1="80" y1="954" x2="1000" y2="954" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- ── MONEVO SAYS ──────────────────────────────────────────────────────── -->
+
+  <text x="80" y="990"
+    font-size="10" font-weight="700" fill="#1A6EFF" letter-spacing="3"
+    >MONEVO SAYS</text>
+
+  <text x="80" y="1030"
+    font-size="20" font-weight="500" fill="#0F172A"
+    >Your net savings grew by +32% this week. Groceries was your primary</text>
+  <text x="80" y="1064"
+    font-size="20" font-weight="500" fill="#0F172A"
+    >expense category at 39%.</text>
+
+  <!-- ── FOOTER ────────────────────────────────────────────────────────────── -->
+
+  <line x1="80" y1="1252" x2="1000" y2="1252" stroke="#E2E8F0" stroke-width="1"/>
+
+  <text x="80" y="1292"
+    font-size="12" font-weight="400" fill="#94A3B8"
+    >14 transactions · 24 Sep — 30 Sep 2026</text>
+
+  <text x="80" y="1316"
+    font-size="11" font-weight="400" fill="#94A3B8"
+    >Generated 30 Sep 2026, 09:45 WAT · Monevo Financial Intelligence</text>
+
+  <text x="1000" y="1292"
+    font-size="16" font-weight="700" fill="#94A3B8" text-anchor="end" letter-spacing="-0.3"
+    >monevo<tspan fill="#1A6EFF">.</tspan></text>
+
+</svg>

@@ -36,8 +36,10 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy compiled JavaScript from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy assets
+# Copy assets, public static files (Admin Dashboard), and demo-studio
 COPY assets/ ./assets/
+COPY public/ ./public/
+COPY demo-studio/ ./demo-studio/
 
 # Use unprivileged node user
 USER node

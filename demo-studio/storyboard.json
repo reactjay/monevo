@@ -1,0 +1,164 @@
+{
+  "project": "Monevo WhatsApp AI Assistant",
+  "theme": "dark",
+  "device": "iPhone 16 Pro (Clean Frame)",
+  "audioFxEnabled": true,
+  "config": {
+    "botName": "Monevo AI",
+    "botStatus": "online",
+    "userName": "Japheth Adamu",
+    "currency": "NGN",
+    "currencySymbol": "₦",
+    "profileType": "Personal finances"
+  },
+  "scenes": [
+    {
+      "id": 1,
+      "time": 0.5,
+      "type": "user_text",
+      "text": "Hi",
+      "timestamp": "09:38",
+      "status": "read"
+    },
+    {
+      "id": 2,
+      "time": 1.5,
+      "type": "bot_message",
+      "body": "Welcome to <b>Monevo</b>! 👋 I'm your WhatsApp AI financial assistant.<br><br>Before we begin, are you using me for:<br><br><b>1. Personal finances</b><br><b>2. Business finances</b>",
+      "interactiveButtons": ["1. Personal", "2. Business"],
+      "timestamp": "09:38"
+    },
+    {
+      "id": 3,
+      "time": 3.0,
+      "type": "user_text",
+      "text": "1. Personal finances",
+      "timestamp": "09:38",
+      "status": "read"
+    },
+    {
+      "id": 4,
+      "time": 3.9,
+      "type": "bot_message",
+      "body": "What's your name?",
+      "timestamp": "09:38"
+    },
+    {
+      "id": 5,
+      "time": 4.8,
+      "type": "user_text",
+      "text": "Japheth Adamu",
+      "timestamp": "09:39",
+      "status": "read"
+    },
+    {
+      "id": 6,
+      "time": 5.6,
+      "type": "bot_message",
+      "body": "What currency do you normally use?",
+      "timestamp": "09:39"
+    },
+    {
+      "id": 7,
+      "time": 6.5,
+      "type": "user_text",
+      "text": "NGN (₦)",
+      "timestamp": "09:39",
+      "status": "read"
+    },
+    {
+      "id": 8,
+      "time": 7.5,
+      "type": "bot_message",
+      "body": "You're all set. 🎉<br><br>You can now send voice notes or text to record income, track expenses, check balances, and generate instant receipts!",
+      "timestamp": "09:39"
+    },
+    {
+      "id": 9,
+      "time": 9.2,
+      "type": "user_text",
+      "text": "Switch to voice mode",
+      "timestamp": "09:40",
+      "status": "read"
+    },
+    {
+      "id": 10,
+      "time": 10.3,
+      "type": "bot_message",
+      "body": "✅ <b>Voice response mode enabled!</b><br>I will now reply with voice notes.",
+      "timestamp": "09:40"
+    },
+    {
+      "id": 11,
+      "time": 11.8,
+      "type": "user_voice_note",
+      "audioDuration": "0:04",
+      "transcript": "Paid 15,000 Naira for groceries at Ikeja market",
+      "timestamp": "09:41",
+      "status": "read"
+    },
+    {
+      "id": 12,
+      "time": 13.0,
+      "type": "processing_indicator",
+      "text": "🎙️ AssemblyAI transcribing voice note..."
+    },
+    {
+      "id": 13,
+      "time": 14.1,
+      "type": "processing_indicator",
+      "text": "⚡ Groq categorizing transaction..."
+    },
+    {
+      "id": 14,
+      "time": 15.2,
+      "type": "bot_voice_note",
+      "audioDuration": "0:04",
+      "voiceSpeech": "I've recorded your expense of 15,000 naira for groceries at Ikeja supermarket.",
+      "transcript": "I've recorded your expense of ₦15,000.00 for Groceries at Ikeja Supermarket.",
+      "timestamp": "09:41"
+    },
+    {
+      "id": 15,
+      "time": 16.5,
+      "type": "bot_receipt_card",
+      "image": "assets/sample-receipt.png",
+      "caption": "Monevo Verified Receipt #REC-20260930-8E4A",
+      "filesize": "142 KB · PNG",
+      "timestamp": "09:41"
+    },
+    {
+      "id": 16,
+      "time": 20.0,
+      "type": "user_voice_note",
+      "audioDuration": "0:03",
+      "transcript": "How much balance I get left this week? Send my report.",
+      "timestamp": "09:42",
+      "status": "read"
+    },
+    {
+      "id": 17,
+      "time": 21.3,
+      "type": "processing_indicator",
+      "text": "📊 Monevo compiling weekly intelligence..."
+    },
+    {
+      "id": 18,
+      "time": 22.6,
+      "type": "bot_voice_note",
+      "audioDuration": "0:05",
+      "voiceSpeech": "You have 122,550 naira net remaining this week. Delivering your weekly chart.",
+      "transcript": "You have ₦122,550.00 net remaining this week (+32% vs last week). Delivering your full weekly chart:",
+      "timestamp": "09:42"
+    },
+    {
+      "id": 19,
+      "time": 24.0,
+      "type": "bot_report_card",
+      "image": "assets/sample-report.png",
+      "caption": "Weekly Financial Intelligence Report",
+      "filesize": "168 KB · PNG",
+      "timestamp": "09:42"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+<svg width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg"
+  font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+
+  <defs>
+    <!-- Subtle cool-white gradient background -->
+    <linearGradient id="amb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── 1. CANVAS BACKGROUND ────────────────────────────────────────────── -->
+  <rect width="1080" height="1350" fill="#FFFFFF"/>
+  <rect width="1080" height="1350" fill="url(#amb)" opacity="0.7"/>
+
+  <!-- ── 2. HEADER (Exact match to reference layout) ──────────────────────── -->
+  <!-- monevo. brand wordmark (top left) -->
+  <text x="80" y="118"
+    font-size="34" font-weight="800" fill="#0F172A" letter-spacing="-0.8"
+    >monevo<tspan fill="#1A6EFF">.</tspan></text>
+
+  <!-- TRANSACTION RECEIPT label + reference (top right) -->
+  <text x="1000" y="100"
+    font-size="11" font-weight="800" fill="#64748B" text-anchor="end" letter-spacing="3"
+    >TRANSACTION RECEIPT</text>
+  <text x="1000" y="122"
+    font-size="14" font-weight="700" fill="#2563EB" text-anchor="end" letter-spacing="0.8"
+    >REC-20260930-8E4A</text>
+
+  <!-- ── 3. AMOUNT DISPLAY ───────────────────────────────────────────────── -->
+  <!-- AMOUNT label -->
+  <text x="80" y="206"
+    font-size="11" font-weight="800" fill="#64748B" letter-spacing="3"
+    >AMOUNT</text>
+
+  <!-- Amount display (large & bold) -->
+  <text x="80" y="304"
+    font-size="86" font-weight="800" fill="#0F172A" letter-spacing="-2.5"
+    >₦15,000.00</text>
+
+  <!-- Status pill -->
+  <rect x="80" y="326" width="72" height="28" rx="14" fill="#DCFCE7"/>
+  <text x="116" y="345"
+    font-size="11" font-weight="800" fill="#16A34A" text-anchor="middle" letter-spacing="2"
+    >PAID</text>
+
+  <!-- Date · time -->
+  <text x="172" y="345"
+    font-size="16" font-weight="500" fill="#64748B"
+    >30 Sep 2026 · 09:41 WAT</text>
+
+  <!-- ── 4. TRANSACTION FLOW ─────────────────────────────────────────────── -->
+  <!-- FROM label -->
+  <text x="80" y="455"
+    font-size="11" font-weight="800" fill="#64748B" letter-spacing="3">FROM</text>
+
+  <!-- TO label -->
+  <text x="1000" y="455"
+    font-size="11" font-weight="800" fill="#64748B" letter-spacing="3" text-anchor="end">TO</text>
+
+  <!-- VIA label -->
+  <text x="540" y="455"
+    font-size="11" font-weight="800" fill="#64748B" letter-spacing="3" text-anchor="middle">VIA</text>
+
+  <!-- Payer name -->
+  <text x="80" y="492"
+    font-size="28" font-weight="700" fill="#0F172A">Japheth Adamu</text>
+
+  <!-- monevo. brand node -->
+  <text x="540" y="492"
+    font-size="22" font-weight="800" fill="#1A6EFF" text-anchor="middle"
+    letter-spacing="-0.3">monevo<tspan fill="#93C5FD">.</tspan></text>
+
+  <!-- Recipient name -->
+  <text x="1000" y="492"
+    font-size="28" font-weight="700" fill="#0F172A" text-anchor="end">Ikeja Supermarket</text>
+
+  <!-- Connecting ledger line -->
+  <line x1="80" y1="504" x2="1000" y2="504" stroke="#F1F5F9" stroke-width="1.5"/>
+
+  <!-- Node dots -->
+  <circle cx="80" cy="504" r="4" fill="#E2E8F0"/>
+  <circle cx="540" cy="504" r="5" fill="#1A6EFF" opacity="0.9"/>
+  <circle cx="1000" cy="504" r="4" fill="#E2E8F0"/>
+
+  <!-- Transaction fingerprint waveform -->
+  <path d="M 80.0 551.9 C 100.6 551.9, 113.6 551.9, 134.1 551.9 C 154.7 551.9, 167.7 547.6, 188.2 547.6 C 208.8 547.6, 221.8 526.3, 242.4 526.3 C 262.9 526.3, 275.9 522.0, 296.5 522.0 C 317.0 522.0, 330.0 522.0, 350.6 522.0 C 371.2 522.0, 384.1 526.3, 404.7 526.3 C 425.3 526.3, 438.3 534.8, 458.8 534.8 C 479.4 534.8, 492.4 522.0, 512.9 522.0 C 533.5 522.0, 546.5 541.2, 567.1 541.2 C 587.6 541.2, 600.6 541.2, 621.2 541.2 C 641.7 541.2, 654.7 528.4, 675.3 528.4 C 695.9 528.4, 708.8 522.0, 729.4 522.0 C 750.0 522.0, 763.0 539.1, 783.5 539.1 C 804.1 539.1, 817.1 539.1, 837.6 539.1 C 858.2 539.1, 871.2 551.9, 891.8 551.9 C 912.3 551.9, 925.3 530.5, 945.9 530.5 C 966.4 530.5, 979.4 543.3, 1000.0 543.3" fill="none" stroke="#1A6EFF" stroke-width="3" opacity="0.12"/>
+  <path d="M 80.0 551.9 C 100.6 551.9, 113.6 551.9, 134.1 551.9 C 154.7 551.9, 167.7 547.6, 188.2 547.6 C 208.8 547.6, 221.8 526.3, 242.4 526.3 C 262.9 526.3, 275.9 522.0, 296.5 522.0 C 317.0 522.0, 330.0 522.0, 350.6 522.0 C 371.2 522.0, 384.1 526.3, 404.7 526.3 C 425.3 526.3, 438.3 534.8, 458.8 534.8 C 479.4 534.8, 492.4 522.0, 512.9 522.0 C 533.5 522.0, 546.5 541.2, 567.1 541.2 C 587.6 541.2, 600.6 541.2, 621.2 541.2 C 641.7 541.2, 654.7 528.4, 675.3 528.4 C 695.9 528.4, 708.8 522.0, 729.4 522.0 C 750.0 522.0, 763.0 539.1, 783.5 539.1 C 804.1 539.1, 817.1 539.1, 837.6 539.1 C 858.2 539.1, 871.2 551.9, 891.8 551.9 C 912.3 551.9, 925.3 530.5, 945.9 530.5 C 966.4 530.5, 979.4 543.3, 1000.0 543.3" fill="none" stroke="#1A6EFF" stroke-width="1.6" opacity="0.38"/>
+
+  <!-- Fingerprint label -->
+  <text x="540" y="572"
+    font-size="10" font-weight="600" fill="#94A3B8" text-anchor="middle" letter-spacing="2"
+    >TRANSACTION SIGNATURE · REC-20260930-8E4A</text>
+
+  <!-- Section rule -->
+  <line x1="80" y1="590" x2="1000" y2="590" stroke="#E2E8F0" stroke-width="1.2"/>
+
+  <!-- ── 5. TRANSACTION DETAILS ──────────────────────────────────────────── -->
+  
+  <text x="80" y="616" font-size="11" font-weight="700" fill="#64748B" letter-spacing="3">DESCRIPTION</text>
+  <text x="80" y="656" font-size="28" font-weight="600" fill="#0F172A">Weekly office &amp; home groceries supplies</text>
+  <line x1="80" y1="696" x2="1000" y2="696" stroke="#F1F5F9" stroke-width="1.2"/>
+  <text x="80" y="704" font-size="11" font-weight="700" fill="#64748B" letter-spacing="3">PAYMENT CHANNEL</text>
+  <text x="80" y="744" font-size="28" font-weight="600" fill="#0F172A">Cash / Transfer</text>
+
+  <!-- ── 6. VERIFICATION BLOCK ──────────────────────────────────────────── -->
+  <!-- Verification rule -->
+  <line x1="80" y1="1072" x2="1000" y2="1072" stroke="#E2E8F0" stroke-width="1.2"/>
+
+  <!-- Checkmark + VERIFIED label -->
+  <g transform="translate(80, 1100)">
+    <circle cx="12" cy="12" r="12" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+    <path d="M 7.5 12 L 10.5 15 L 16.5 9"
+      fill="none" stroke="#16A34A" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="34" y="16.5"
+      font-size="11" font-weight="800" fill="#64748B" letter-spacing="3"
+      >VERIFIED TRANSACTION</text>
+  </g>
+
+  <!-- Reference -->
+  <text x="80" y="1160"
+    font-size="11" font-weight="700" fill="#94A3B8" letter-spacing="1.5">REFERENCE</text>
+  <text x="260" y="1160"
+    font-size="14" font-weight="700" fill="#2563EB" letter-spacing="0.5">REC-20260930-8E4A</text>
+
+  <!-- Timestamp -->
+  <text x="80" y="1188"
+    font-size="11" font-weight="700" fill="#94A3B8" letter-spacing="1.5">TIMESTAMP</text>
+  <text x="260" y="1188"
+    font-size="14" font-weight="500" fill="#1E293B">30 Sep 2026 · 09:41 WAT</text>
+
+  <!-- ── 7. FOOTER ────────────────────────────────────────────────────────── -->
+  <line x1="80" y1="1248" x2="1000" y2="1248" stroke="#F1F5F9" stroke-width="1.2"/>
+
+  <text x="80" y="1284"
+    font-size="13" font-weight="500" fill="#94A3B8"
+    >Generated by Monevo · AI-powered financial records via WhatsApp</text>
+
+  <text x="1000" y="1284"
+    font-size="16" font-weight="800" fill="#0F172A" text-anchor="end" letter-spacing="-0.3"
+    >monevo<tspan fill="#1A6EFF">.</tspan></text>
+
+  <!-- Subtle hackathon attribution -->
+  <text x="540" y="1314"
+    font-size="10" font-weight="500" fill="#94A3B8" text-anchor="middle" opacity="0.6"
+    >Voice infrastructure: AssemblyAI</text>
+
+</svg>

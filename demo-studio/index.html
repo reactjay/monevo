@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monevo — Pro Demo Video Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Top Header Navigation ────────────────────────────────────── -->
+  <header class="studio-header">
+    <div class="brand-badge">
+      <div class="brand-logo">M</div>
+      <div class="brand-title">
+        monevo<span style="color:#1A6EFF">.</span>
+        <span class="tag">Demo Studio</span>
+      </div>
+    </div>
+
+    <div class="studio-actions">
+      <a href="/admin" target="_blank" class="btn" style="text-decoration:none; color:#f8fafc;" title="Open Monevo Admin Dashboard">
+        📊 Admin Dashboard ↗
+      </a>
+      <button class="btn" id="voiceModeBtn" title="Switch Monevo to reply with voice notes">
+        🎙️ Monevo Voice Mode: OFF
+      </button>
+      <button class="btn btn-toggle-active" id="inspectModeBtn" title="Toggle automatic full-screen receipt view">
+        🔍 Auto-View Receipt: ON
+      </button>
+      <button class="btn" id="toggleDrawerBtn">
+        ⚙️ Customize Script & Data
+      </button>
+      <button class="btn btn-record" id="recordBtn">
+        🎥 Record & Download Video
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Stage (iPhone 16 Pro Clean Frame on Dark Vignette) ── -->
+  <main class="studio-stage" id="studioStage">
+
+    <div class="device-container" id="deviceStage">
+      <!-- Hardware buttons on titanium frame -->
+      <div class="device-btn-action"></div>
+      <div class="device-btn-vol-up"></div>
+      <div class="device-btn-vol-down"></div>
+      <div class="device-btn-power"></div>
+
+      <!-- Glass reflection sheen -->
+      <div class="device-reflection"></div>
+
+      <!-- Clean Minimal Status Bar (No Dynamic Island, No Battery % / Network icons) -->
+      <div class="phone-status-bar">
+        <span class="status-time">09:40</span>
+      </div>
+
+      <!-- WhatsApp App Header -->
+      <div class="wa-chat-header">
+        <div class="wa-header-left">
+          <div class="wa-back-btn">‹ <span>3</span></div>
+          <div class="wa-avatar-wrap">
+            <div class="wa-avatar">M</div>
+            <div class="wa-verified-badge">✓</div>
+          </div>
+          <div class="wa-contact-info">
+            <div class="wa-contact-name">
+              <span id="contactName">Monevo AI</span>
+            </div>
+            <div class="wa-contact-status" id="contactStatus">online</div>
+          </div>
+        </div>
+
+        <div class="wa-header-icons">
+          <span>📹</span>
+          <span>📞</span>
+          <span>⋮</span>
+        </div>
+      </div>
+
+      <!-- WhatsApp Conversation Body -->
+      <div class="wa-chat-body" id="chatBody">
+        <div class="wa-date-pill">Today</div>
+        <!-- Animated messages inject here dynamically -->
+      </div>
+
+      <!-- WhatsApp Input Bar -->
+      <div class="wa-input-bar">
+        <span style="font-size: 22px; color: var(--wa-accent-green); cursor: pointer;">＋</span>
+        <div class="wa-input-box">
+          <span style="font-size: 16px; opacity: 0.6;">😊</span>
+          <span class="wa-input-placeholder">Ask Monevo anything...</span>
+          <span style="font-size: 16px; opacity: 0.6;">📎</span>
+          <span style="font-size: 16px; opacity: 0.6;">📷</span>
+        </div>
+        <div class="wa-mic-btn">🎙️</div>
+      </div>
+
+      <!-- In-Phone Native Media Viewer (View Receipt / Report Fullscreen) -->
+      <div class="in-phone-media-viewer" id="inPhoneViewer">
+        <div class="viewer-top-bar">
+          <div class="viewer-back-btn" id="closeViewerBtn">‹ <span>Chat</span></div>
+          <div class="viewer-title" id="viewerTitle">Receipt #REC-20260930-8E4A</div>
+          <div class="viewer-actions">
+            <span>⭐</span>
+            <span style="cursor:pointer;" id="downloadViewerDocBtn" title="Download PNG">⬇️</span>
+            <span>⋮</span>
+          </div>
+        </div>
+        <div class="viewer-content">
+          <img id="viewerImage" src="" alt="Monevo Document">
+        </div>
+        <div class="viewer-bottom-bar">
+          <span class="viewer-timestamp" id="viewerTimestamp">Today at 09:41</span>
+          <span class="viewer-badge">✔ Verified by Monevo</span>
+        </div>
+      </div>
+
+      <!-- Home Indicator -->
+      <div class="phone-home-indicator"></div>
+    </div>
+
+  </main>
+
+  <!-- ── Bottom Timeline Scrubber & Playback Bar ──────────────────── -->
+  <footer class="studio-timeline-bar">
+    <div class="timeline-playback-btns">
+      <button class="round-btn play-btn" id="playBtn" title="Play / Pause">▶️</button>
+      <button class="round-btn" id="restartBtn" title="Restart">🔄</button>
+    </div>
+
+    <div class="timeline-scrubber-wrap">
+      <div class="time-counter" id="timeCounter">00:00 / 00:23</div>
+      <div class="slider-track" id="sliderTrack">
+        <div class="slider-fill" id="sliderFill">
+          <div class="slider-handle"></div>
+        </div>
+      </div>
+      <select class="speed-select" id="speedSelect">
+        <option value="0.75">0.75x</option>
+        <option value="1.0" selected>1.0x (Normal)</option>
+        <option value="1.25">1.25x</option>
+        <option value="1.5">1.5x</option>
+      </select>
+    </div>
+  </footer>
+
+  <!-- ── Slide-out Customizer Drawer ──────────────────────────────── -->
+  <aside class="customizer-drawer" id="customizerDrawer">
+    <div class="drawer-header">
+      <h3>Customize Script & Data</h3>
+      <button class="close-drawer-btn" id="closeDrawerBtn">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label>Bot Display Name</label>
+      <input type="text" class="form-control" id="editBotName" value="Monevo AI">
+    </div>
+
+    <div class="form-group">
+      <label>User Display Name</label>
+      <input type="text" class="form-control" id="editUserName" value="Japheth Adamu">
+    </div>
+
+    <div class="form-group">
+      <label>Monevo Reply Format</label>
+      <select class="form-control" id="editResponseMode">
+        <option value="text" selected>💬 Text Messages</option>
+        <option value="voice">🎙️ Voice Notes (Monevo Audio Reply)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Onboarding Initial Greeting</label>
+      <input type="text" class="form-control" id="editUserGreeting" value="Hi">
+    </div>
+
+    <div class="form-group">
+      <label>Profile Choice</label>
+      <input type="text" class="form-control" id="editProfileChoice" value="1. Personal finances">
+    </div>
+
+    <div class="form-group">
+      <label>Voice Note 1 (Expense Logging Transcript)</label>
+      <textarea class="form-control" id="editVoice1">Paid 15,000 Naira for groceries at Ikeja market</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Monevo Expense Response Text</label>
+      <textarea class="form-control" id="editBotReply1">I've recorded your expense of ₦15,000.00 for Groceries at Ikeja Supermarket. Here is your verified digital receipt:</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Voice Note 2 (Financial Query / Report Transcript)</label>
+      <textarea class="form-control" id="editVoice2">How much balance I get left this week? Send my report.</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Monevo Report Response Text</label>
+      <textarea class="form-control" id="editBotReply2">You have ₦122,550.00 net remaining this week (+32% vs last week). Delivering your full weekly chart:</textarea>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 24px;">
+      <button class="btn btn-primary" id="saveConfigBtn" style="flex:1;">Save & Apply</button>
+      <button class="btn" id="resetConfigBtn">Reset Default</button>
+    </div>
+  </aside>
+
+  <!-- ── Modal Image Preview for Tap-to-Inspect ───────────────────── -->
+  <div class="receipt-modal" id="receiptModal">
+    <div class="receipt-modal-content">
+      <button class="modal-close-btn">&times;</button>
+      <img id="modalImage" src="" alt="Monevo Financial Document">
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
