@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.gitignore
+.env
+.env.*
+.DS_Store
+*.log
+Monevo_Pitch_Deck.pdf
+presentation.html
+.agents
