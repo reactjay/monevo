@@ -146,7 +146,9 @@ export async function sendUserResponse(
   responseText: string,
   options: { forceVoiceIfAvailable?: boolean } = {}
 ): Promise<{ modeSent: 'text' | 'voice'; mediaId?: string }> {
-  const responseMode = user.responseMode || (options.forceVoiceIfAvailable ? 'voice' : 'text');
+  const responseMode = options.forceVoiceIfAvailable
+    ? 'voice'
+    : (user.responseMode || 'text');
 
   // 1. Always deliver formatted text response to WhatsApp chat immediately
   await sendTextMessage(user.whatsappId, responseText);
