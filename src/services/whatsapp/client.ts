@@ -224,12 +224,22 @@ export async function uploadMedia(
 
 export interface WhatsAppMediaInfo {
   url: string;
+  downloadUrl?: string;
   mimeType: string;
   fileSize?: number;
   id: string;
 }
 
 export async function getMediaInfo(mediaId: string): Promise<WhatsAppMediaInfo> {
+  if (mediaId.startsWith('http://') || mediaId.startsWith('https://')) {
+    return {
+      url: mediaId,
+      downloadUrl: mediaId,
+      mimeType: 'audio/ogg',
+      id: mediaId,
+    };
+  }
+
   const query = env.KAPSO_API_KEY && env.META_WHATSAPP_PHONE_NUMBER_ID
     ? `?phone_number_id=${env.META_WHATSAPP_PHONE_NUMBER_ID}`
     : '';
@@ -238,6 +248,7 @@ export async function getMediaInfo(mediaId: string): Promise<WhatsAppMediaInfo> 
   try {
     const response = await axios.get<{
       url?: string;
+      download_url?: string;
       mime_type?: string;
       file_size?: number;
       id?: string;
@@ -256,16 +267,23 @@ export async function getMediaInfo(mediaId: string): Promise<WhatsAppMediaInfo> 
       );
     }
 
-    if (!response.data || !response.data.url) {
+    const targetUrl = response.data?.download_url || response.data?.url;
+    if (!response.data || !targetUrl) {
       throw new WhatsAppApiError('Failed to retrieve media URL from Meta API');
     }
 
-    return {
-      url: response.data.url,
+    const info: WhatsAppMediaInfo = {
+      url: response.data.url || targetUrl,
       mimeType: response.data.mime_type || 'audio/ogg',
       fileSize: response.data.file_size,
       id: response.data.id || mediaId,
     };
+
+    if (response.data.download_url) {
+      info.downloadUrl = response.data.download_url;
+    }
+
+    return info;
   } catch (err) {
     toWhatsAppApiError(err);
   }
@@ -281,37 +299,52 @@ export async function downloadWhatsAppAudio(
     throw new WhatsAppApiError(`Audio file size (${mediaInfo.fileSize} bytes) exceeds 25MB limit`);
   }
 
-  try {
-    const downloadHeaders: Record<string, string> = {};
-    if (mediaInfo.url.includes('kapso.ai') && env.KAPSO_API_KEY) {
-      downloadHeaders['X-API-Key'] = env.KAPSO_API_KEY;
-    } else if (env.META_WHATSAPP_ACCESS_TOKEN) {
-      downloadHeaders['Authorization'] = `Bearer ${env.META_WHATSAPP_ACCESS_TOKEN}`;
+  // Prioritize downloadUrl (signed Kapso download endpoint), then fallback to direct url
+  const candidateUrls = [
+    mediaInfo.downloadUrl,
+    mediaInfo.url,
+  ].filter((u): u is string => Boolean(u));
+
+  let lastError: unknown;
+
+  for (const targetUrl of candidateUrls) {
+    try {
+      const downloadHeaders: Record<string, string> = {};
+      if (targetUrl.includes('kapso.ai') && env.KAPSO_API_KEY) {
+        downloadHeaders['X-API-Key'] = env.KAPSO_API_KEY;
+      } else if (env.META_WHATSAPP_ACCESS_TOKEN) {
+        downloadHeaders['Authorization'] = `Bearer ${env.META_WHATSAPP_ACCESS_TOKEN}`;
+      }
+
+      const response = await axios.get<ArrayBuffer>(targetUrl, {
+        headers: downloadHeaders,
+        responseType: 'arraybuffer',
+        timeout: 30_000,
+      });
+
+      const rawData = response.data;
+      const buffer = Buffer.isBuffer(rawData)
+        ? rawData
+        : Buffer.from(rawData);
+      if (buffer.length === 0) {
+        throw new WhatsAppApiError('Downloaded audio buffer is empty');
+      }
+
+      if (buffer.length > MAX_AUDIO_BYTES) {
+        throw new WhatsAppApiError(`Audio file size (${buffer.length} bytes) exceeds 25MB limit`);
+      }
+
+      return {
+        buffer,
+        mimeType: mediaInfo.mimeType,
+      };
+    } catch (err) {
+      lastError = err;
+      if (candidateUrls.length > 1) {
+        console.warn(`[VOICE:download] Candidate download failed, trying fallback source`);
+      }
     }
-
-    const response = await axios.get<ArrayBuffer>(mediaInfo.url, {
-      headers: downloadHeaders,
-      responseType: 'arraybuffer',
-      timeout: 30_000,
-    });
-
-    const rawData = response.data;
-    const buffer = Buffer.isBuffer(rawData)
-      ? rawData
-      : Buffer.from(rawData);
-    if (buffer.length === 0) {
-      throw new WhatsAppApiError('Downloaded audio buffer is empty');
-    }
-
-    if (buffer.length > MAX_AUDIO_BYTES) {
-      throw new WhatsAppApiError(`Audio file size (${buffer.length} bytes) exceeds 25MB limit`);
-    }
-
-    return {
-      buffer,
-      mimeType: mediaInfo.mimeType,
-    };
-  } catch (err) {
-    toWhatsAppApiError(err);
   }
+
+  toWhatsAppApiError(lastError);
 }
