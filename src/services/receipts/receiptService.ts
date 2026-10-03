@@ -5,25 +5,32 @@ import { IUserDocument } from '../../models/User';
 import { Receipt, IReceiptDocument } from '../../models/Receipt';
 import { Transaction, ITransactionDocument } from '../../models/Transaction';
 import { generateReceiptSvg, ReceiptTemplateData } from './receiptTemplate';
+import { generateReceiptPdf } from './pdfService';
+import { sanitizeReceiptInput } from './receiptSanitizer';
 import { formatCurrency } from '../tools/formatters';
 import { uploadMedia, sendImageMessage } from '../whatsapp/client';
 
 export interface CreateReceiptParams {
   user: IUserDocument;
-  payer: string;
+  payer?: string;
+  payer_name?: string;
   amount: number;
   currency?: string;
   description?: string;
+  notes?: string;
   transactionId?: Types.ObjectId;
   source?: 'text' | 'voice';
   whatsappMessageId?: string;
   issuedAt?: Date;
+  date?: string | Date;
+  include_contact_phone?: boolean;
 }
 
 export interface GeneratedReceiptResult {
   receipt: IReceiptDocument;
   receiptNumber: string;
   pngBuffer: Buffer;
+  pdfBuffer?: Buffer;
   svg: string;
   mediaId?: string;
 }
@@ -72,26 +79,37 @@ export function formatReceiptDate(date: Date = new Date()): string {
 export async function createAndStoreReceipt(
   params: CreateReceiptParams
 ): Promise<GeneratedReceiptResult> {
-  const {
-    user,
-    payer,
-    amount,
-    currency = user.currency || 'NGN',
-    description = 'Payment Received',
-    source = 'text',
-    whatsappMessageId,
-    issuedAt = new Date(),
-  } = params;
+  const { user, source = 'text', whatsappMessageId } = params;
 
-  if (!amount || amount <= 0) {
-    throw new Error('Receipt amount must be greater than zero');
-  }
-
-  if (!payer || payer.trim().length === 0) {
+  const rawPayer = params.payer_name || params.payer;
+  if (!rawPayer || !rawPayer.trim()) {
     throw new Error('Receipt payer name is required');
   }
 
-  // 1. Resolve or create associated income Transaction
+  const rawAmount = params.amount;
+  if (!rawAmount || rawAmount <= 0) {
+    throw new Error('Receipt amount must be greater than zero');
+  }
+
+  // 1. Strict Input Sanitization & Boundary Enforcement (Issue #19)
+  const sanitized = sanitizeReceiptInput(
+    {
+      payer_name: rawPayer,
+      amount: rawAmount,
+      description: params.description || params.notes,
+      currency: params.currency || user.currency,
+      date: params.issuedAt || params.date,
+    },
+    user.currency
+  );
+
+  const payer = sanitized.payer;
+  const description = sanitized.description;
+  const amount = sanitized.amount;
+  const currency = sanitized.currency;
+  const issuedAt = sanitized.date;
+
+  // 2. Resolve or create associated income Transaction
   let transactionId = params.transactionId;
   if (!transactionId) {
     // Try to find a recent matching income transaction within last 24h
@@ -114,7 +132,7 @@ export async function createAndStoreReceipt(
         amount,
         currency: currency.toUpperCase(),
         category: 'payment',
-        description: description || `Payment from ${payer}`,
+        description,
         counterparty: payer,
         date: issuedAt,
         source,
@@ -145,6 +163,10 @@ export async function createAndStoreReceipt(
     ? user.businessName || user.name || 'Merchant'
     : user.name || 'Account Holder';
 
+  const shouldIncludeContactPhone = params.include_contact_phone !== undefined
+    ? Boolean(params.include_contact_phone)
+    : Boolean(user.include_phone_on_receipts);
+
   const templateData: ReceiptTemplateData = {
     receiptNumber,
     date: formatReceiptDate(issuedAt),
@@ -155,6 +177,8 @@ export async function createAndStoreReceipt(
     businessPhone: user.phone,
     businessAddress: user.businessAddress,
     userPhone: user.phone || user.whatsappId,
+    include_contact_phone: shouldIncludeContactPhone,
+    includeContactPhone: shouldIncludeContactPhone,
     amount,
     formattedAmount,
     currency: currency.toUpperCase(),
@@ -162,9 +186,10 @@ export async function createAndStoreReceipt(
     status: 'PAID',
   };
 
-  // 4. Generate deterministic SVG & render PNG buffer
+  // 4. Generate deterministic SVG, render PNG buffer, and generate Vector PDF
   const svg = generateReceiptSvg(templateData);
   const pngBuffer = await renderReceiptPng(svg);
+  const pdfBuffer = await generateReceiptPdf(templateData);
 
   // 5. Save Receipt document in MongoDB
   const receipt = await Receipt.create({
@@ -183,6 +208,7 @@ export async function createAndStoreReceipt(
     receipt,
     receiptNumber,
     pngBuffer,
+    pdfBuffer,
     svg,
   };
 }
@@ -214,3 +240,7 @@ export async function sendReceiptToWhatsApp(
 
   return mediaId;
 }
+
+export { generateReceiptPdf, generateInvoicePdf } from './pdfService';
+
+

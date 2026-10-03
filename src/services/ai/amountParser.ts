@@ -110,39 +110,164 @@ export function extractCurrency(text: string, defaultCurrency = 'NGN'): string {
   return defaultCurrency.toUpperCase();
 }
 
+export const USD_CURRENCY_REGEX = /\$|\b(?:usd|dollars?)\b/i;
+export const NGN_CURRENCY_REGEX = /₦|\b(?:ngn|naira)\b/i;
+
+export const THOUSAND_MULTIPLIER_REGEX = /^(?:k|thousands?)$/i;
+export const MILLION_MULTIPLIER_REGEX = /^(?:m|mils?|millions?|bars?)$/i;
+
+export const SLANG_AMOUNT_REGEX =
+  /(?:[₦$£€]|(?:NGN|USD)\s*)?\s*(-?\d+(?:,\d{3})*(?:\.\d+)?|-?\d*\.\d+)\s*(thousands?|k|millions?|mils?|bars?|m)\b/gi;
+
+export const PLAIN_AMOUNT_REGEX =
+  /(?:[₦$£€]|(?:NGN|USD)\s*)?\s*(-?\d{1,3}(?:,\d{3})+(?:\.\d+)?|-?\d+(?:\.\d+)?)\b/g;
+
+export interface ParsedTransaction {
+  amount: number;
+  currency: 'NGN' | 'USD';
+  valid?: boolean;
+  error?: string;
+}
+
+/**
+ * Normalizes Nigerian numerical slang and currency formats from conversational text.
+ *
+ * Requirements:
+ * 1. Handles abbreviations in conversational text:
+ *    - "k" or "thousand" -> multiply by 1,000 (e.g., "500k" -> 500,000)
+ *    - "m" or "mils" / "million" / "bar" -> multiply by 1,000,000 (e.g., "1.5m" or "2bar" -> 1,500,000 or 2,000,000)
+ * 2. Detects currency context (NGN / ₦ vs USD / $). Defaults to NGN if unspecified.
+ * 3. Returns a clean positive numeric integer representing major units without ledger arithmetic.
+ * 4. Explicitly rejects <= 0. If a negative value is parsed (e.g., "-5000"), returns a validation error
+ *    stating amounts must be strictly positive without sign-flipping.
+ */
+export function parseTransaction(text: string): ParsedTransaction | null {
+  if (!text || typeof text !== 'string') return null;
+
+  // 1. Detect currency context (NGN / ₦ vs USD / $). Default to NGN if unspecified.
+  const currency: 'NGN' | 'USD' = USD_CURRENCY_REGEX.test(text) ? 'USD' : 'NGN';
+
+  // 2. Handle abbreviations and Nigerian numerical slang
+  const slangMatches = [...text.matchAll(SLANG_AMOUNT_REGEX)];
+  if (slangMatches.length > 0) {
+    const candidates = slangMatches
+      .map((match) => {
+        const rawNum = parseFloat(match[1].replace(/,/g, ''));
+        const unit = match[2].toLowerCase();
+        let multiplier = 1;
+
+        if (THOUSAND_MULTIPLIER_REGEX.test(unit)) {
+          multiplier = 1_000;
+        } else if (MILLION_MULTIPLIER_REGEX.test(unit)) {
+          multiplier = 1_000_000;
+        }
+
+        // Do NOT sign-flip with Math.abs
+        return Math.round(rawNum * multiplier);
+      })
+      .filter((amt) => !isNaN(amt));
+
+    if (candidates.length > 0) {
+      // Find candidate: if any negative or zero is parsed, or max candidate
+      const negativeCandidate = candidates.find((c) => c <= 0);
+      if (negativeCandidate !== undefined) {
+        return {
+          amount: negativeCandidate,
+          currency,
+          valid: false,
+          error: 'Amounts must be strictly positive. Negative amounts are not allowed.',
+        };
+      }
+
+      return {
+        amount: Math.max(...candidates),
+        currency,
+      };
+    }
+  }
+
+  // 3. Fallback to plain numeric values
+  const plainMatches = [...text.matchAll(PLAIN_AMOUNT_REGEX)];
+  if (plainMatches.length > 0) {
+    const candidates = plainMatches
+      .map((match) => {
+        const raw = match[1];
+        const val = parseFloat(raw.replace(/,/g, ''));
+        let score = 0;
+        if (raw.includes(',')) score += 100;
+        const absVal = Math.abs(val);
+        if (absVal >= 1000) score += 50;
+        else if (absVal >= 100) score += 30;
+        if (absVal <= 10 && plainMatches.length > 1) score -= 50; // likely a quantity
+        // Do NOT sign-flip with Math.abs
+        return { val: Math.round(val), score };
+      })
+      .filter((c) => !isNaN(c.val));
+
+    if (candidates.length > 0) {
+      // If any candidate is negative or zero, do not sign-flip; return validation error
+      const negativeCandidate = candidates.find((c) => c.val <= 0);
+      if (negativeCandidate !== undefined) {
+        return {
+          amount: negativeCandidate.val,
+          currency,
+          valid: false,
+          error: 'Amounts must be strictly positive. Negative amounts are not allowed.',
+        };
+      }
+
+      candidates.sort((a, b) => b.score - a.score || b.val - a.val);
+      return {
+        amount: candidates[0].val,
+        currency,
+      };
+    }
+  }
+
+  return null;
+}
+
 /**
  * Extracts numeric amount from string, supporting standard digits, formatted digits,
- * k/m shorthand, and written words. Smartly distinguishes prices from item quantities (e.g. "1 deep freezer 250,000").
+ * k/m shorthand, Nigerian slang (thousand, mils, million, bar), and written words.
+ * Smartly distinguishes prices from item quantities (e.g. "1 deep freezer 250,000").
  */
 export function extractAmount(text: string, defaultCurrency = 'NGN'): ExtractedAmount | null {
   const currency = extractCurrency(text, defaultCurrency);
 
   // 1. Explicit currency symbol or currency code match (highest confidence)
   // e.g. ₦250,000, $150, ₦ 5000, NGN 250000, 150000 naira
-  const explicitCurrencyRegex = /(?:[₦$£€]|(?:NGN|USD|GBP|EUR)\s+)\s*(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)\s*([kKmM])?\b|\b(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)\s*([kKmM])?\s*(?:naira|dollars|pounds|euros|ngn|usd|gbp|eur)\b/i;
+  const explicitCurrencyRegex = /(?:[₦$£€]|(?:NGN|USD|GBP|EUR)\s+)\s*(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)\s*(thousands?|k|millions?|mils?|bars?|m)?\b|\b(\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)\s*(thousands?|k|millions?|mils?|bars?|m)?\s*(?:naira|dollars|pounds|euros|ngn|usd|gbp|eur)\b/i;
   const explicitMatch = text.match(explicitCurrencyRegex);
   if (explicitMatch) {
     const rawNum = (explicitMatch[1] || explicitMatch[3])?.replace(/,/g, '');
     const suffix = (explicitMatch[2] || explicitMatch[4])?.toLowerCase();
     if (rawNum) {
       let val = parseFloat(rawNum);
-      if (suffix === 'k') val *= 1_000;
-      if (suffix === 'm') val *= 1_000_000;
+      if (suffix) {
+        if (THOUSAND_MULTIPLIER_REGEX.test(suffix)) val *= 1_000;
+        else if (MILLION_MULTIPLIER_REGEX.test(suffix)) val *= 1_000_000;
+      }
       if (!isNaN(val) && val > 0) {
         return { amount: Math.round(val * 100) / 100, currency };
       }
     }
   }
 
-  // 2. Shorthand notation like 150k, 5k, 1.5m
-  const shorthandMatch = text.match(/([₦$£€]?\s*(\d+(\.\d+)?)\s*([kKmM])\b)/);
-  if (shorthandMatch) {
-    const val = parseFloat(shorthandMatch[2]);
-    const multiplier = shorthandMatch[4].toLowerCase() === 'k' ? 1_000 : 1_000_000;
-    return {
-      amount: Math.round(val * multiplier * 100) / 100,
-      currency,
-    };
+  // 2. Shorthand and Nigerian slang notation like 150k, 2bar, 1.5m, 1.5mils, 2.5 million
+  const slangMatch = text.match(
+    /(?:[₦$£€]|(?:NGN|USD|GBP|EUR)\s+)?\s*(\d+(?:,\d{3})*(?:\.\d+)?|\d*\.\d+)\s*(thousands?|k|millions?|mils?|bars?|m)\b/i
+  );
+  if (slangMatch) {
+    const val = parseFloat(slangMatch[1].replace(/,/g, ''));
+    const unit = slangMatch[2].toLowerCase();
+    const multiplier = THOUSAND_MULTIPLIER_REGEX.test(unit) ? 1_000 : 1_000_000;
+    if (!isNaN(val) && val > 0) {
+      return {
+        amount: Math.round(val * multiplier * 100) / 100,
+        currency,
+      };
+    }
   }
 
   // 3. Collect all candidate numbers in text

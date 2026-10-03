@@ -5,11 +5,16 @@ import {
   transcribeAudioWithGroq,
   generateInteractiveResponseWithGroq,
   isGroqConfigured,
+  isFailureOrConfirmationPrompt,
 } from '../services/ai/groqService';
 import { extractIntent } from '../services/ai/intentExtractor';
 import { dispatchIntent } from '../services/tools/toolDispatcher';
 import { handleClarificationResponse } from '../services/clarification/clarificationService';
 import { sendUserResponse } from '../services/tts/ttsService';
+import {
+  isModelInfrastructureQuery,
+  MONEVO_IDENTITY_RESPONSE,
+} from '../services/ai/modelIdentityGuard';
 import { User } from '../models/User';
 
 export const NO_AUDIO_MEDIA_MESSAGE =
@@ -87,6 +92,14 @@ export async function handleAudioMessage(
 
       const effectiveUserName = user.name || message.senderName;
 
+      // 3a. Model Identity & Anti-Hallucination Guard: deterministic bypass
+      if (isModelInfrastructureQuery(cleanTranscript)) {
+        await sendUserResponse(user, MONEVO_IDENTITY_RESPONSE, {
+          forceVoiceIfAvailable: user.responseMode === 'voice',
+        });
+        return result;
+      }
+
       // 4. Check if user is responding to an active clarification request via voice
       const clarificationReply = await handleClarificationResponse(user, cleanTranscript, {
         user,
@@ -119,24 +132,32 @@ export async function handleAudioMessage(
       console.log(`[VOICE:intent] intent=${intent.intent} from=${user.whatsappId}`);
 
       // 6. Execute Financial Tool & reply with natural WhatsApp formatting
-      const responseText = await dispatchIntent(intent, {
-        user,
-        source: 'voice',
-        transcript: cleanTranscript,
-        whatsappMessageId: message.messageId,
-      });
+      let responseText: string;
+      try {
+        responseText = await dispatchIntent(intent, {
+          user,
+          source: 'voice',
+          transcript: cleanTranscript,
+          whatsappMessageId: message.messageId,
+        });
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        responseText = `❌ *Transaction Failed*\n\n${errorMsg}\n\nYour balance remains unaltered.`;
+      }
 
       console.log(`[VOICE:reply] to=${user.whatsappId} mode=${user.responseMode || 'text'} reply="${responseText.replace(/\n/g, ' ')}"`);
 
       // 7. Generate interactive response addressing user warmly
-      const finalResponse = isGroqConfigured()
-        ? await generateInteractiveResponseWithGroq({
-            userName: effectiveUserName,
-            userMessage: cleanTranscript,
-            toolResultText: responseText,
-            intent,
-          })
-        : responseText;
+      // Persistence-First Guarantee: Never pass failure messages or confirmation prompts to the LLM
+      const finalResponse =
+        isGroqConfigured() && !isFailureOrConfirmationPrompt(responseText)
+          ? await generateInteractiveResponseWithGroq({
+              userName: effectiveUserName,
+              userMessage: cleanTranscript,
+              toolResultText: responseText,
+              intent,
+            })
+          : responseText;
 
       await sendUserResponse(user, finalResponse, {
         forceVoiceIfAvailable: user.responseMode === 'voice',

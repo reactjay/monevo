@@ -17,7 +17,7 @@ export async function getUserProfile(
  */
 export async function updateUserProfile(
   userId: Types.ObjectId | string,
-  updates: Partial<Pick<IUser, 'name' | 'phone' | 'businessName' | 'businessAddress' | 'currency' | 'profileType' | 'responseMode' | 'weeklyReportsEnabled'>>
+  updates: Partial<Pick<IUser, 'name' | 'phone' | 'businessName' | 'businessAddress' | 'currency' | 'profileType' | 'responseMode' | 'weeklyReportsEnabled' | 'include_phone_on_receipts'>>
 ): Promise<IUserDocument | null> {
   const userObjectId = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
 
@@ -30,6 +30,7 @@ export async function updateUserProfile(
   if (updates.profileType !== undefined) allowedUpdates.profileType = updates.profileType;
   if (updates.responseMode !== undefined) allowedUpdates.responseMode = updates.responseMode;
   if (updates.weeklyReportsEnabled !== undefined) allowedUpdates.weeklyReportsEnabled = updates.weeklyReportsEnabled;
+  if (updates.include_phone_on_receipts !== undefined) allowedUpdates.include_phone_on_receipts = updates.include_phone_on_receipts;
 
   return User.findByIdAndUpdate(userObjectId, { $set: allowedUpdates }, { returnDocument: 'after' }).exec();
 }

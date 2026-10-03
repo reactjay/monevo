@@ -19,7 +19,11 @@ const TransactionSchema = new Schema<ITransactionDocument>(
     amount: {
       type: Number,
       required: [true, 'amount is required'],
-      min: [0.01, 'amount must be greater than 0'],
+      min: [1, 'amount must be greater than 0'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'amount must be an integer stored strictly in minor units',
+      },
     },
     currency: {
       type: String,

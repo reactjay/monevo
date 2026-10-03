@@ -8,6 +8,7 @@ import { extractIntent } from '../services/ai/intentExtractor';
 import { dispatchIntent } from '../services/tools/toolDispatcher';
 import { IUserDocument } from '../models/User';
 import Groq from 'groq-sdk';
+import { cleanWhatsAppFormatting } from '../utils/whatsappFormatter';
 
 jest.mock('../services/tools/userProfile', () => ({
   updateUserProfile: jest.fn().mockResolvedValue(null),
@@ -228,8 +229,6 @@ describe('Groq AI Integration & Interactive Personalization', () => {
   });
 
   describe('cleanWhatsAppFormatting', () => {
-    const { cleanWhatsAppFormatting } = require('../utils/whatsappFormatter');
-
     it('strips markdown headers (###, ##, #) and converts them to bold *...*', () => {
       const input = '### 1️⃣ Track every *kobo* you spend\n## 2️⃣ Spot the spenders\n# 3️⃣ Budget';
       const output = cleanWhatsAppFormatting(input);

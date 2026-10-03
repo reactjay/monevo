@@ -26,6 +26,7 @@ const UserSchema = new Schema<IUserDocument>(
     onboardingComplete: { type: Boolean, default: false },
     weeklyReportsEnabled: { type: Boolean, default: true },
     responseMode: { type: String, enum: ['text', 'voice'], default: 'text' },
+    include_phone_on_receipts: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

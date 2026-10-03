@@ -35,12 +35,15 @@ export async function getBalance(
     transactionCount += group.count;
   }
 
-  const balance = totalIncome - totalExpenses;
+  const totalIncomeInt = Math.round(totalIncome);
+  const totalExpensesInt = Math.round(totalExpenses);
+  const balance = totalIncomeInt - totalExpensesInt;
 
   return {
     balance,
-    totalIncome,
-    totalExpenses,
+    balanceBigInt: BigInt(balance),
+    totalIncome: totalIncomeInt,
+    totalExpenses: totalExpensesInt,
     currency,
     transactionCount,
   };

@@ -49,6 +49,7 @@ export interface IUser {
   onboardingComplete: boolean;
   weeklyReportsEnabled?: boolean;
   responseMode?: 'text' | 'voice';
+  include_phone_on_receipts?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,7 +57,7 @@ export interface IUser {
 export interface ITransaction {
   userId: Types.ObjectId;
   type: 'income' | 'expense';
-  amount: number;
+  amount: number | bigint;
   currency: string;
   category: string;
   description?: string;
@@ -114,3 +115,23 @@ export interface IWeeklyReport {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type InvoiceStatus = 'pending' | 'paid' | 'overdue';
+
+export interface IInvoice {
+  userId: Types.ObjectId;
+  clientName: string;
+  clientPhone?: string;
+  amount: number; // stored as integer minor units (kobo/cents)
+  currency: string;
+  description?: string;
+  dueDate: Date;
+  status: InvoiceStatus;
+  reminderCount: number;
+  invoiceNumber?: string;
+  lastReminderSentAt?: Date;
+  paidAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+

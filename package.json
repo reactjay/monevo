@@ -13,8 +13,8 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage"
   },
   "dependencies": {
     "assemblyai": "^4.38.0",
@@ -29,6 +29,7 @@
     "morgan": "^1.10.0",
     "msedge-tts": "^2.0.7",
     "node-cron": "^4.6.0",
+    "pdfkit": "^0.20.2",
     "sharp": "^0.35.4",
     "zod": "^3.23.8"
   },
@@ -39,6 +40,7 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.5.0",
     "@types/node-cron": "^3.0.11",
+    "@types/pdfkit": "^0.17.6",
     "@types/sharp": "^0.31.1",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.18.0",

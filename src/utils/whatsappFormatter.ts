@@ -30,7 +30,8 @@ export function cleanWhatsAppFormatting(text: string): string {
   cleaned = cleaned.replace(/”\*/g, '”').replace(/\*”/g, '”').replace(/“\*/g, '“');
 
   // 5. If text ends with an unfinished, cut-off fragment (e.g. '*4️⃣ Save before you' without closing '*')
-  cleaned = cleaned.replace(/\n+\s*\*[0-9️⃣🔟#\s]+[^*\n]*$/g, '');
+  // eslint-disable-next-line no-misleading-character-class
+  cleaned = cleaned.replace(/\n+\s*\*[0-9️⃣🔟#\s]+[^*\n]*$/gu, '');
 
   // 6. Reduce 3+ consecutive newlines to 2
   cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();

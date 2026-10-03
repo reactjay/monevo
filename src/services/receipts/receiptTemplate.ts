@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Monevo Receipt Template — 1080 × 1350 WhatsApp Visual Format
 // Exact Editorial Fintech Layout in Pure White / Light Theme
-// ─────────────────────────────────────────────────────────────────────────────
+import { sanitizePayerName, sanitizeDescription } from './receiptSanitizer';
 
 export interface ReceiptTemplateData {
   receiptNumber: string;
@@ -14,11 +14,15 @@ export interface ReceiptTemplateData {
   businessPhone?: string;
   businessAddress?: string;
   userPhone?: string;
+  include_contact_phone?: boolean;
+  includeContactPhone?: boolean;
   amount: number;
   formattedAmount: string;
   currency: string;
   description: string;
   status?: string;
+  isInvoice?: boolean;
+  dueDate?: string;
 }
 
 // ── Pure White / Light Theme Palette ──────────────────────────────────────────
@@ -131,20 +135,25 @@ const LINE_EXTRA = 32;
 function buildFields(data: ReceiptTemplateData): DetailField[] {
   const fields: DetailField[] = [];
 
-  const descLines = wrapText(data.description || 'General payment', 42);
+  const safeDesc = sanitizeDescription(data.description, 'General payment');
+  const descLines = wrapText(safeDesc, 42);
   fields.push({ label: 'DESCRIPTION', lines: descLines, height: ROW_BASE + (descLines.length - 1) * LINE_EXTRA });
 
   fields.push({ label: 'PAYMENT CHANNEL', lines: ['Cash / Transfer'], height: ROW_BASE });
 
-  const phone = data.isBusiness
-    ? data.businessPhone || data.userPhone || ''
-    : data.userPhone || '';
-  if (phone) {
-    fields.push({ label: 'CONTACT', lines: [truncate(phone, 28)], height: ROW_BASE });
+  const shouldIncludePhone = data.include_contact_phone === true || data.includeContactPhone === true;
+  if (shouldIncludePhone) {
+    const phone = data.isBusiness
+      ? data.businessPhone || data.userPhone || ''
+      : data.userPhone || '';
+    if (phone) {
+      fields.push({ label: 'CONTACT', lines: [truncate(phone, 28)], height: ROW_BASE });
+    }
   }
 
   if (data.isBusiness && data.businessAddress) {
-    const addrLines = wrapText(data.businessAddress, 42);
+    const safeAddress = sanitizeDescription(data.businessAddress, '');
+    const addrLines = wrapText(safeAddress, 42);
     fields.push({ label: 'ADDRESS', lines: addrLines.slice(0, 2), height: ROW_BASE + (Math.min(addrLines.length, 2) - 1) * LINE_EXTRA });
   }
 
@@ -190,23 +199,40 @@ export function generateReceiptSvg(data: ReceiptTemplateData): string {
   const MX = 80;       // horizontal margin
   const RX = W - MX;   // right edge = 1000
 
+  // ── Receipt Renderer Guard ──────────────────────────────────────────────────
+  // Strictly enforce sanitization on all dynamic fields before SVG generation
+  const safePayer = sanitizePayerName(data.payer, 'Valued Customer');
+  const safeRecipient = sanitizePayerName(
+    data.isBusiness
+      ? data.businessName || data.recipientName || 'Merchant'
+      : data.recipientName || 'Account Holder',
+    'Merchant'
+  );
+  const safeDescription = sanitizeDescription(data.description, 'General payment');
+
   const status     = escapeXml(data.status || 'PAID');
   const receiptNum = escapeXml(data.receiptNumber);
   const dateStr    = escapeXml(data.date);
   const timeStr    = escapeXml(data.time || '');
-  const payer      = escapeXml(truncate(data.payer || 'Valued Customer', 30));
-  const recipient  = escapeXml(
-    truncate(
-      data.isBusiness
-        ? data.businessName || data.recipientName || 'Merchant'
-        : data.recipientName || 'Account Holder',
-      30
-    )
-  );
+  const payer      = escapeXml(truncate(safePayer, 30));
+  const recipient  = escapeXml(truncate(safeRecipient, 30));
   const formattedAmount = escapeXml(data.formattedAmount);
   const amtFS = amountFontSize(data.formattedAmount);
 
-  const fields = buildFields(data);
+  const shouldIncludePhone = data.include_contact_phone === true || data.includeContactPhone === true;
+
+  const guardedData: ReceiptTemplateData = {
+    ...data,
+    payer: safePayer,
+    description: safeDescription,
+    recipientName: safeRecipient,
+    include_contact_phone: shouldIncludePhone,
+    includeContactPhone: shouldIncludePhone,
+    userPhone: shouldIncludePhone ? data.userPhone : undefined,
+    businessPhone: shouldIncludePhone ? data.businessPhone : undefined,
+  };
+
+  const fields = buildFields(guardedData);
   const DETAILS_START = 616;
   const { svg: fieldsSvg, endY: detailsEnd } = renderFields(fields, DETAILS_START);
 

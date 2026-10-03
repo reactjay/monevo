@@ -104,7 +104,7 @@ describe('Phase 11: Professional Receipt Generation', () => {
       }
     });
 
-    it('generates professional SVG for a personal user', () => {
+    it('generates professional SVG for a personal user (excludes phone by default)', () => {
       const data: ReceiptTemplateData = {
         receiptNumber: 'REC-20260911-TEST',
         date: '11 Sep 2026',
@@ -127,11 +127,12 @@ describe('Phase 11: Professional Receipt Generation', () => {
       expect(svg).toContain('₦150,000');
       expect(svg).toContain('Website development');
       expect(svg).toContain('PAID');
-      expect(svg).toContain('+234 801 122 3344');
+      expect(svg).not.toContain('+234 801 122 3344');
+      expect(svg).not.toContain('CONTACT');
       expect(svg).toContain('</svg>');
     });
 
-    it('generates professional SVG for a business user including business name and address', () => {
+    it('generates professional SVG for a business user including business name and address (excludes phone by default)', () => {
       const data: ReceiptTemplateData = {
         receiptNumber: 'REC-20260911-BIZ1',
         date: '11 Sep 2026',
@@ -151,10 +152,32 @@ describe('Phase 11: Professional Receipt Generation', () => {
       const svg = generateReceiptSvg(data);
       expect(svg).toContain('Anagonye Tech Labs Ltd');
       expect(svg).toContain('14 Admiralty Way, Lekki Phase 1, Lagos');
-      expect(svg).toContain('+234 809 988 7766');
+      expect(svg).not.toContain('+234 809 988 7766');
+      expect(svg).not.toContain('CONTACT');
       expect(svg).toContain('Globex Corp');
       expect(svg).toContain('₦500,000');
       expect(svg).toContain('PAID');
+    });
+
+    it('includes contact phone when include_contact_phone is explicitly true', () => {
+      const data: ReceiptTemplateData = {
+        receiptNumber: 'REC-20260911-PHONE',
+        date: '11 Sep 2026',
+        payer: 'David Adeleke',
+        recipientName: 'Ada Lovelace',
+        isBusiness: false,
+        userPhone: '+234 801 122 3344',
+        include_contact_phone: true,
+        amount: 150000,
+        formattedAmount: '₦150,000',
+        currency: 'NGN',
+        description: 'Website development',
+        status: 'PAID',
+      };
+
+      const svg = generateReceiptSvg(data);
+      expect(svg).toContain('CONTACT');
+      expect(svg).toContain('+234 801 122 3344');
     });
 
     it('handles long description gracefully with multi-line tspans in SVG', () => {
@@ -448,6 +471,165 @@ describe('Phase 11: Professional Receipt Generation', () => {
 
       const updated = await Receipt.findById(receiptResult.receipt._id);
       expect(updated?.mediaReference).toBe('media_id_abc999');
+    });
+  });
+
+  // ── 8. Receipt PII Protection & Sender Contact Info (Issue #22) ──
+  describe('Receipt PII Protection & Sender Contact Info (Issue #22)', () => {
+    it('excludes sender phone number by default when generating receipt', async () => {
+      const result = await createAndStoreReceipt({
+        user: personalUser,
+        payer: 'David',
+        amount: 50000,
+        currency: 'NGN',
+        description: 'Consultation',
+      });
+
+      expect(result.svg).not.toContain(personalUser.phone);
+      expect(result.svg).not.toContain(personalUser.whatsappId);
+      expect(result.svg).not.toContain('CONTACT');
+    });
+
+    it('populates contact number when include_contact_phone = true is explicitly requested', async () => {
+      const result = await createAndStoreReceipt({
+        user: personalUser,
+        payer: 'David',
+        amount: 50000,
+        currency: 'NGN',
+        description: 'Consultation',
+        include_contact_phone: true,
+      });
+
+      expect(result.svg).toContain('CONTACT');
+      expect(result.svg).toContain(personalUser.phone!);
+    });
+
+    it('uses user profile preference include_phone_on_receipts if not overridden', async () => {
+      const privacyUser = await User.create({
+        whatsappId: '2348199990001',
+        profileType: 'personal',
+        name: 'Privacy Minded',
+        phone: '+234 819 999 0001',
+        currency: 'NGN',
+        include_phone_on_receipts: true,
+      });
+
+      const resultWithPhone = await createAndStoreReceipt({
+        user: privacyUser,
+        payer: 'David',
+        amount: 50000,
+      });
+      expect(resultWithPhone.svg).toContain('+234 819 999 0001');
+
+      // Explicit override: include_contact_phone = false overrides profile setting
+      const resultOverridden = await createAndStoreReceipt({
+        user: privacyUser,
+        payer: 'David',
+        amount: 50000,
+        include_contact_phone: false,
+      });
+      expect(resultOverridden.svg).not.toContain('+234 819 999 0001');
+      expect(resultOverridden.svg).not.toContain('CONTACT');
+    });
+
+    it('generateReceiptTool includes privacy disclosure tip when phone is excluded by default', async () => {
+      jest.spyOn(whatsappClient, 'uploadMedia').mockResolvedValue('mock_id');
+      jest.spyOn(whatsappClient, 'sendImageMessage').mockResolvedValue(undefined);
+
+      const res = await generateReceiptTool({
+        user: personalUser,
+        intent: {
+          intent: 'generate_receipt',
+          target: {
+            payer_name: 'David',
+            amount: 50000,
+            description: 'Consultation',
+          },
+        },
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.message).toContain("💡 Tip: Your phone number was excluded from this receipt for privacy. To include it next time, say 'include my phone number'.");
+    });
+
+    it('generateReceiptTool informs user when phone was included upon explicit request', async () => {
+      jest.spyOn(whatsappClient, 'uploadMedia').mockResolvedValue('mock_id');
+      jest.spyOn(whatsappClient, 'sendImageMessage').mockResolvedValue(undefined);
+
+      const res = await generateReceiptTool({
+        user: personalUser,
+        intent: {
+          intent: 'generate_receipt',
+          target: {
+            payer_name: 'David',
+            amount: 50000,
+            description: 'Consultation',
+            include_contact_phone: true,
+          },
+        },
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.message).toContain("💡 Tip: Your phone number was included on this receipt. To exclude it next time, say 'exclude my phone number'.");
+      expect(res.receiptResult?.svg).toContain(personalUser.phone!);
+    });
+
+    it('extracts include_contact_phone override from natural language prompt', async () => {
+      const intentWithPhone = await extractIntent(
+        'Receipt for David 150k for web design, include my phone number',
+        { defaultCurrency: 'NGN' }
+      );
+
+      expect(intentWithPhone.intent).toBe('generate_receipt');
+      if (intentWithPhone.intent === 'generate_receipt') {
+        expect(intentWithPhone.target.counterparty).toBe('David');
+        expect(intentWithPhone.target.amount).toBe(150000);
+        expect(intentWithPhone.target.include_contact_phone).toBe(true);
+        expect(intentWithPhone.target.description).not.toContain('phone number');
+      }
+
+      const intentWithoutPhone = await extractIntent(
+        'Receipt for David 150k for web design, do not include my phone number',
+        { defaultCurrency: 'NGN' }
+      );
+
+      expect(intentWithoutPhone.intent).toBe('generate_receipt');
+      if (intentWithoutPhone.intent === 'generate_receipt') {
+        expect(intentWithoutPhone.target.include_contact_phone).toBe(false);
+      }
+    });
+
+    it('toggles user profile include_phone_on_receipts preference via text command', async () => {
+      const user = await User.create({
+        whatsappId: '2348123456789',
+        profileType: 'personal',
+        name: 'Test Toggler',
+        phone: '+234 812 345 6789',
+        currency: 'NGN',
+        include_phone_on_receipts: false,
+      });
+
+      const intentEnable = await extractIntent('include my phone number');
+      expect(intentEnable.intent).toBe('profile_update');
+      if (intentEnable.intent === 'profile_update') {
+        expect(intentEnable.fields.include_phone_on_receipts).toBe(true);
+      }
+
+      const replyEnable = await dispatchIntent(intentEnable, { user, source: 'text' });
+      expect(replyEnable).toContain('Phone number will now be included on future receipts.');
+      const updatedUser = await User.findById(user._id);
+      expect(updatedUser?.include_phone_on_receipts).toBe(true);
+
+      const intentDisable = await extractIntent('exclude my phone number');
+      expect(intentDisable.intent).toBe('profile_update');
+      if (intentDisable.intent === 'profile_update') {
+        expect(intentDisable.fields.include_phone_on_receipts).toBe(false);
+      }
+
+      const replyDisable = await dispatchIntent(intentDisable, { user, source: 'text' });
+      expect(replyDisable).toContain('Phone number will now be excluded from future receipts for privacy.');
+      const finalUser = await User.findById(user._id);
+      expect(finalUser?.include_phone_on_receipts).toBe(false);
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   sendReceiptToWhatsApp,
   GeneratedReceiptResult,
 } from '../receipts/receiptService';
+import { sanitizeReceiptInput, sanitizePayerName } from '../receipts/receiptSanitizer';
 import { formatCurrency } from './formatters';
 
 export interface GenerateReceiptToolParams {
@@ -22,6 +23,7 @@ export interface GenerateReceiptToolResult {
 
 /**
  * Validates, generates, stores, and sends a professional receipt.
+ * Strict Tool Calling & Prompt Injection Hardening (Issue #19 / Finding #3).
  */
 export async function generateReceiptTool(
   params: GenerateReceiptToolParams
@@ -30,12 +32,16 @@ export async function generateReceiptTool(
   const target = intent.target;
   const userCurrency = user.currency || 'NGN';
 
+  const rawPayer = target.payer_name || target.counterparty;
+  const rawDesc = target.description || target.notes;
+
   // 1. Missing Amount Validation
   if (!target.amount || target.amount <= 0) {
-    if (target.counterparty) {
+    if (rawPayer) {
+      const safePayer = sanitizePayerName(rawPayer);
       return {
         success: false,
-        message: `How much was the receipt for *${target.counterparty}*?\n\nExample: "Receipt for ${target.counterparty} 50,000 for consulting"`,
+        message: `How much was the receipt for *${safePayer}*?\n\nExample: "Receipt for ${safePayer} 50,000 for consulting"`,
       };
     }
     return {
@@ -45,7 +51,7 @@ export async function generateReceiptTool(
   }
 
   // 2. Missing Payer Validation
-  if (!target.counterparty || target.counterparty.trim().length === 0) {
+  if (!rawPayer || !rawPayer.trim()) {
     const formattedAmt = formatCurrency(target.amount, userCurrency);
     return {
       success: false,
@@ -53,16 +59,32 @@ export async function generateReceiptTool(
     };
   }
 
-  // 3. Create & Store Receipt deterministically
-  const payer = target.counterparty.trim();
-  const description = target.description || `Payment from ${payer}`;
+  // 3. Strict Input Sanitization & Boundary Enforcement (Issue #19)
+  const sanitized = sanitizeReceiptInput(
+    {
+      payer_name: rawPayer,
+      amount: target.amount,
+      description: rawDesc,
+      date: target.date,
+      currency: userCurrency,
+    },
+    userCurrency
+  );
+
+  const contactPhoneIncluded = target.include_contact_phone !== undefined
+    ? Boolean(target.include_contact_phone)
+    : Boolean(user.include_phone_on_receipts);
 
   const receiptResult = await createAndStoreReceipt({
     user,
-    payer,
-    amount: target.amount,
-    currency: userCurrency,
-    description,
+    payer: sanitized.payer,
+    payer_name: sanitized.payer_name,
+    amount: sanitized.amount,
+    currency: sanitized.currency,
+    description: sanitized.description,
+    notes: sanitized.notes,
+    date: sanitized.date,
+    include_contact_phone: target.include_contact_phone,
     source,
     whatsappMessageId,
   });
@@ -75,16 +97,22 @@ export async function generateReceiptTool(
     // Return receipt confirmation text even if media upload fails in edge cases
   }
 
-  const formattedAmt = formatCurrency(target.amount, userCurrency);
+  const formattedAmt = formatCurrency(sanitized.amount, userCurrency);
+  const privacyTip = contactPhoneIncluded
+    ? "💡 Tip: Your phone number was included on this receipt. To exclude it next time, say 'exclude my phone number'."
+    : "💡 Tip: Your phone number was excluded from this receipt for privacy. To include it next time, say 'include my phone number'.";
+
   const confirmationMessage = `🧾 *Receipt Generated Successfully!*
 
 *Receipt No:* \`${receiptResult.receiptNumber}\`
-*Payer:* ${payer}
+*Payer:* ${sanitized.payer}
 *Amount:* ${formattedAmt}
-*Description:* ${description}
+*Description:* ${sanitized.description}
 *Status:* PAID ✅
 
-Your receipt image has been generated and sent above.`;
+Your receipt image has been generated and sent above.
+
+${privacyTip}`;
 
   return {
     success: true,

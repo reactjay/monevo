@@ -37,6 +37,7 @@ export const RecordTransactionDetailsSchema = z.object({
   description: z.string().min(1),
   counterparty: z.string().nullable().default(null),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' }),
+  confirmed: z.boolean().optional(),
 });
 export type RecordTransactionDetails = z.infer<typeof RecordTransactionDetailsSchema>;
 
@@ -75,13 +76,23 @@ export const FinancialQueryIntentSchema = z.object({
 export type FinancialQueryIntent = z.infer<typeof FinancialQueryIntentSchema>;
 
 // ── 4. Generate Receipt Intent ───────────────────────────────
+export const GenerateReceiptDetailsSchema = z.object({
+  payer_name: z.string().nullable().optional(),
+  counterparty: z.string().nullable().optional(),
+  amount: z.number().positive().optional(),
+  description: z.string().optional(),
+  notes: z.string().optional(),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' })
+    .optional(),
+  include_contact_phone: z.boolean().optional(),
+});
+export type GenerateReceiptDetails = z.infer<typeof GenerateReceiptDetailsSchema>;
+
 export const GenerateReceiptIntentSchema = z.object({
   intent: z.literal('generate_receipt'),
-  target: z.object({
-    counterparty: z.string().nullable().optional(),
-    amount: z.number().positive().optional(),
-    description: z.string().optional(),
-  }),
+  target: GenerateReceiptDetailsSchema,
 });
 export type GenerateReceiptIntent = z.infer<typeof GenerateReceiptIntentSchema>;
 
@@ -94,6 +105,7 @@ export const ProfileUpdateIntentSchema = z.object({
     businessName: z.string().optional(),
     businessAddress: z.string().optional(),
     responseMode: z.enum(['text', 'voice']).optional(),
+    include_phone_on_receipts: z.boolean().optional(),
   }),
 });
 export type ProfileUpdateIntent = z.infer<typeof ProfileUpdateIntentSchema>;
