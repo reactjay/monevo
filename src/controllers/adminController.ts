@@ -258,10 +258,10 @@ export async function getAdminUserDetails(req: Request, res: Response): Promise<
     const voiceTransactions = transactions.filter((t) => t.source === 'voice');
     const incomeTotal = transactions
       .filter((t) => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
     const expenseTotal = transactions
       .filter((t) => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
     res.status(200).json({
       success: true,

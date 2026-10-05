@@ -6,7 +6,7 @@ import { QueryPeriod, TransactionType } from '../ai/schemas';
 export interface RecordTransactionParams {
   userId: Types.ObjectId | string;
   type: TransactionType;
-  amount: number;
+  amount: number | bigint | string;
   currency?: string;
   category: string;
   description?: string;
@@ -15,21 +15,30 @@ export interface RecordTransactionParams {
   source: 'text' | 'voice';
   transcript?: string;
   whatsappMessageId?: string;
+  isMinorUnits?: boolean;
+  confirmed?: boolean;
+  requireConfirmationBeforeWrite?: boolean;
 }
 
 export interface RecordTransactionResult {
   transaction: ITransactionDocument;
-  runningBalance: number;
+  verifiedId: string;
+  isVerified: boolean;
+  runningBalance: number | bigint;
   formattedResponse: string;
+  requires_confirmation?: boolean;
+  requiresConfirmation?: boolean;
 }
 
 export interface BalanceResult {
-  balance: number;
-  totalIncome: number;
-  totalExpenses: number;
+  balance: number | bigint;
+  balanceBigInt?: bigint;
+  totalIncome: number | bigint;
+  totalExpenses: number | bigint;
   currency: string;
   transactionCount: number;
 }
+
 
 export interface CategorySummaryItem {
   category: string;

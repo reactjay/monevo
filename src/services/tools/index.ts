@@ -9,3 +9,5 @@ export * from './getLargestExpense';
 export * from './getTransactions';
 export * from './userProfile';
 export * from './toolDispatcher';
+export * from './transactionValidator';
+

@@ -17,11 +17,12 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
 /**
  * Formats a numeric amount with commas and the appropriate currency symbol.
  */
-export function formatCurrency(amount: number, currency = 'NGN'): string {
+export function formatCurrency(amount: number | bigint, currency = 'NGN'): string {
   const normCurrency = (currency || 'NGN').toUpperCase().trim();
   const symbol = CURRENCY_SYMBOLS[normCurrency];
-  const isNegative = amount < 0;
-  const absAmount = Math.abs(amount);
+  const numAmount = typeof amount === 'bigint' ? Number(amount) : amount;
+  const isNegative = numAmount < 0;
+  const absAmount = Math.abs(numAmount);
   const formattedNum = absAmount.toLocaleString('en-US', {
     minimumFractionDigits: absAmount % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
@@ -94,8 +95,13 @@ export function formatPeriodLabel(period: string): string {
  */
 export function formatTransactionConfirmation(
   transaction: ITransactionDocument,
-  runningBalance: number
+  runningBalance: number | bigint
 ): string {
+  if (!transaction || !transaction._id) {
+    throw new Error(
+      'Persistence-First Guarantee violated: Cannot format transaction confirmation without verified document ID.'
+    );
+  }
   const isIncome = transaction.type === 'income';
   const header = isIncome ? '✅ Income recorded' : '✅ Expense recorded';
   const formattedAmount = formatCurrency(transaction.amount, transaction.currency);
@@ -402,4 +408,11 @@ export function formatPeriodComparison(
 
   return lines.join('\n');
 }
+
+export {
+  formatTransactionsChat,
+  formatTransactionsByTimeframe,
+  formatLineDate,
+  getHeaderForPeriod,
+} from '../transactions/transactionService';
 

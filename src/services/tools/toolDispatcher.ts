@@ -1,6 +1,7 @@
 import { FinancialIntent } from '../ai/schemas';
 import { ToolContext } from './types';
 import { recordTransaction } from './recordTransaction';
+import { validateTransactionAmount } from './transactionValidator';
 import { getBalance } from './getBalance';
 import { getPeriodSummary } from './getPeriodSummary';
 import { getCategorySummary } from './getCategorySummary';
@@ -77,20 +78,44 @@ export async function dispatchIntent(
 
   switch (intent.intent) {
     case 'record_transaction': {
-      const result = await recordTransaction({
-        userId: user._id,
-        type: intent.transaction.type,
-        amount: intent.transaction.amount,
-        currency: intent.transaction.currency || userCurrency,
-        category: intent.transaction.category,
-        description: intent.transaction.description,
-        counterparty: intent.transaction.counterparty,
-        date: intent.transaction.date,
-        source,
-        transcript,
-        whatsappMessageId,
-      });
-      return result.formattedResponse;
+      try {
+        const txCurrency = intent.transaction.currency || userCurrency;
+        const validation = validateTransactionAmount(intent.transaction.amount, txCurrency);
+
+        if (!validation.valid) {
+          return `❌ *Transaction Failed*\n\n${validation.error}\n\nYour balance remains unaltered.`;
+        }
+
+        if (validation.requires_confirmation && !intent.transaction.confirmed) {
+          const formattedAmt = formatCurrency(validation.amountMajor, txCurrency);
+          const categoryLabel = capitalizeWords(intent.transaction.category);
+          return `⚠️ *Transaction Confirmation Required*\n\nAmount: *${formattedAmt}* for *${categoryLabel}* exceeds the high-value confirmation threshold.\n\nPlease confirm to proceed.`;
+        }
+
+        const result = await recordTransaction({
+          userId: user._id,
+          type: intent.transaction.type,
+          amount: intent.transaction.amount,
+          currency: txCurrency,
+          category: intent.transaction.category,
+          description: intent.transaction.description,
+          counterparty: intent.transaction.counterparty,
+          date: intent.transaction.date,
+          source,
+          transcript,
+          whatsappMessageId,
+          confirmed: intent.transaction.confirmed,
+        });
+
+        if (!result || !result.isVerified || !result.verifiedId) {
+          return `❌ *Transaction Failed*\n\nPersistence verification failed: Record could not be verified in the database.\n\nYour balance remains unaltered.`;
+        }
+
+        return result.formattedResponse;
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        return `❌ *Transaction Failed*\n\n${errorMsg}\n\nYour balance remains unaltered.`;
+      }
     }
 
     case 'clarification_required': {
@@ -225,6 +250,12 @@ export async function dispatchIntent(
       if (intent.fields.responseMode === 'text') {
         user.responseMode = 'text';
         return '✅ Text response mode enabled! I will now reply with text messages.';
+      }
+      if (intent.fields.include_phone_on_receipts !== undefined) {
+        user.include_phone_on_receipts = intent.fields.include_phone_on_receipts;
+        return intent.fields.include_phone_on_receipts
+          ? '✅ Phone number will now be included on future receipts.'
+          : '✅ Phone number will now be excluded from future receipts for privacy.';
       }
       return '✅ Your profile information has been updated successfully.';
     }

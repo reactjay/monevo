@@ -1,3 +1,6 @@
+import nodeCrypto from 'crypto';
+import nodeBuffer from 'buffer';
+
 // Runs before any module import in every test file.
 // Provides the minimum env vars needed for tests without a real .env file.
 process.env.NODE_ENV = 'test';
@@ -10,3 +13,15 @@ process.env.ASSEMBLYAI_API_KEY = 'test-assemblyai-key';
 // The binary is cached in node_modules/.cache/mongodb-memory-server/ and
 // does not re-download between runs.
 process.env.MONGOMS_VERSION = '6.0.14';
+
+if (!globalThis.crypto) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).crypto = nodeCrypto;
+}
+
+if (!globalThis.File && (nodeBuffer as unknown as { File: unknown }).File) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).File = (nodeBuffer as unknown as { File: unknown }).File;
+}
+
+

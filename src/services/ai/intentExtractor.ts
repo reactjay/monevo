@@ -14,6 +14,7 @@ import { extractAmount, extractCurrency } from './amountParser';
 import { inferCategory } from './categoryParser';
 
 import { extractIntentWithGroq, isGroqConfigured } from './groqService';
+import { isModelInfrastructureQuery, MONEVO_IDENTITY_RESPONSE } from './modelIdentityGuard';
 
 export interface ExtractionOptions {
   defaultCurrency?: string;
@@ -127,7 +128,16 @@ export async function extractIntent(
 ): Promise<FinancialIntent> {
   const cleanText = text.trim();
 
-  // ── 0. Groq AI LLM Intent Extraction (primary when configured) ──
+  // ── 0. Grounded Model Self-Identification & Anti-Hallucination Guard ──
+  // Deterministic bypass: prevent LLM calls and architecture/model hallucinations
+  if (isModelInfrastructureQuery(cleanText)) {
+    return FinancialIntentSchema.parse({
+      intent: 'conversation',
+      reply: MONEVO_IDENTITY_RESPONSE,
+    });
+  }
+
+  // ── 0a. Groq AI LLM Intent Extraction (primary when configured) ──
   if (isGroqConfigured()) {
     try {
       const groqIntent = await extractIntentWithGroq(cleanText, options);
@@ -218,6 +228,42 @@ export async function extractIntent(
     return FinancialIntentSchema.parse(profileResult);
   }
 
+  // ── 1c. Receipt Phone Privacy Preference Updates ─────────────
+  const isReceiptCommand =
+    /\b(create|generate|send|make|issue|drop|get)\s+(a\s+)?receipt\b/i.test(lower) ||
+    lower.startsWith('receipt for') ||
+    lower.startsWith('receipt to') ||
+    lower.startsWith('make receipt');
+
+  if (!isReceiptCommand) {
+    if (
+      /\b(include|show|add)\s+(my\s+)?(phone|contact|number|phone\s+number)\s*(on|to|for|in)?\s*(receipts?)?\b/i.test(lower) ||
+      lower === 'include my phone number' ||
+      lower === 'include phone number' ||
+      lower === 'include phone'
+    ) {
+      const profileResult: ProfileUpdateIntent = {
+        intent: 'profile_update',
+        fields: { include_phone_on_receipts: true },
+      };
+      return FinancialIntentSchema.parse(profileResult);
+    }
+
+    if (
+      /\b(exclude|hide|omit|remove|don't\s+include|do\s+not\s+include|stop\s+including)\s+(my\s+)?(phone|contact|number|phone\s+number)\s*(on|from|for|in)?\s*(receipts?)?\b/i.test(lower) ||
+      lower === 'exclude my phone number' ||
+      lower === 'hide my phone number' ||
+      lower === 'exclude phone number' ||
+      lower === 'hide phone'
+    ) {
+      const profileResult: ProfileUpdateIntent = {
+        intent: 'profile_update',
+        fields: { include_phone_on_receipts: false },
+      };
+      return FinancialIntentSchema.parse(profileResult);
+    }
+  }
+
   // ── 2. Generate Receipt Intent ──────────────────────────────
   if (
     /\b(create|generate|send|make|issue|drop|get)\s+(a\s+)?receipt\b/i.test(lower) ||
@@ -248,10 +294,19 @@ export async function extractIntent(
     // Extract description
     let description: string | undefined;
 
+    // Check explicit phone inclusion/exclusion flag
+    let includeContactPhone: boolean | undefined = undefined;
+    if (/\b(exclude|hide|omit|without|don't\s+include|do\s+not\s+include|no)\s+(my\s+)?(phone|contact|number|phone\s+number)\b/i.test(cleanText)) {
+      includeContactPhone = false;
+    } else if (/\b(include|show|add|with)\s+(my\s+)?(phone|contact|number|phone\s+number)\b/i.test(cleanText)) {
+      includeContactPhone = true;
+    }
+
     // Direct extraction by stripping receipt prefixes, counterparty, amount, and date words
     let remaining = cleanText;
     remaining = remaining.replace(/\b(create|generate|send|make|issue|drop|get)\s+(a\s+)?receipt\s+(for|to)?\b/gi, '');
     remaining = remaining.replace(/^receipt\s+(for|to)\s+/gi, '');
+    remaining = remaining.replace(/\b(with|without|include|exclude|hide|show|omit|don't\s+include|do\s+not\s+include|no)\s+(my\s+)?(phone|contact|number|phone\s+number)\b/gi, '');
     if (counterparty) {
       remaining = remaining.replace(new RegExp(`\\b${counterparty}\\b`, 'gi'), '');
     }
@@ -271,7 +326,7 @@ export async function extractIntent(
     remaining = remaining.replace(/\bpaid\s+(by|to\s+)?/gi, '');
     // Clean leading action prepositions (e.g. "bought", "for", "paid for", "received for")
     remaining = remaining.replace(/^\s*(bought|paid\s+for|received\s+for|for|payment\s+for)\s+/i, '');
-    remaining = remaining.replace(/[,\.]+/g, ' ').trim();
+    remaining = remaining.replace(/[,.]+/g, ' ').trim();
 
     if (remaining.length > 1) {
       description = remaining.charAt(0).toUpperCase() + remaining.slice(1);
@@ -299,9 +354,11 @@ export async function extractIntent(
     const receiptResult: GenerateReceiptIntent = {
       intent: 'generate_receipt',
       target: {
+        payer_name: counterparty ?? null,
         counterparty: counterparty ?? null,
         amount: amountData?.amount,
         description,
+        ...(includeContactPhone !== undefined ? { include_contact_phone: includeContactPhone } : {}),
       },
     };
     return FinancialIntentSchema.parse(receiptResult);
